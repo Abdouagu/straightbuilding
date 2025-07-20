@@ -28,7 +28,7 @@
 #   MVNW_USERNAME/MVNW_PASSWORD - user and password for downloading maven
 #   MVNW_VERBOSE - true: enable verbose log; debug: trace the mvnw script; others: silence the output
 # ----------------------------------------------------------------------------
-
+#build
 set -euf
 [ "${MVNW_VERBOSE-}" != debug ] || set -x
 
