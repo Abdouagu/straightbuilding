@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: springboot-construction
+    env: java
+    buildCommand: ./mvnw clean install
+    startCommand: java -jar target/construction-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://ton-host:5432/construction_db
+      - key: SPRING_DATASOURCE_USERNAME
+        value: postgres
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: 1234
