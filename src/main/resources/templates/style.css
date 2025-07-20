@@ -1,0 +1,109 @@
+/* styles.css - Responsive Design */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    margin: 0;
+
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 0px; /* Réduit l'espace entre le logo et le champ email */
+}
+
+.logo img {
+    width: 100%;
+    max-width: 200px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: bold;
+}
+
+form input {
+    width: 100%;
+    padding: 12px 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+form input:focus {
+    outline: none;
+    border-color: #ae1d3e;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+}
+
+form button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ae1d3e; /* Rouge du logo */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #8b1732;
+}
+
+.links {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.links a {
+    color: #ae1d3e;
+    text-decoration: none;
+    margin: 0 8px;
+    display: block;
+    margin-top: 10px;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+/* Media Queries pour les petits écrans */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 20px 15px;
+    }
+
+    form input,
+    form button {
+        font-size: 14px;
+    }
+
+    .links a {
+        font-size: 13px;
+    }
+}

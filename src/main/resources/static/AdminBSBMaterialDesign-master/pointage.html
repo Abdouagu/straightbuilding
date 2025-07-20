@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>Welcome To | Bootstrap Based Admin Template - Material Design</title>
+    <!-- Favicon-->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+
+    <!-- Bootstrap Core Css -->
+    <link href="plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Waves Effect Css -->
+    <link href="plugins/node-waves/waves.css" rel="stylesheet" />
+
+    <!-- Animation Css -->
+    <link href="plugins/animate-css/animate.css" rel="stylesheet" />
+
+    <!-- Morris Chart Css-->
+    <link href="plugins/morrisjs/morris.css" rel="stylesheet" />
+
+    <!-- Custom Css -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
+    <link href="css/themes/all-themes.css" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.min.js"></script>
+
+</head>
+
+<body class="theme-red">
+<!-- Page Loader -->
+<div class="page-loader-wrapper">
+    <div class="loader">
+        <div class="preloader">
+            <div class="spinner-layer pl-red">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+        <p>Please wait...</p>
+    </div>
+</div>
+<!-- #END# Page Loader -->
+<!-- Overlay For Sidebars -->
+<div class="overlay"></div>
+<!-- #END# Overlay For Sidebars -->
+<!-- Search Bar -->
+<div class="search-bar">
+    <div class="search-icon">
+        <i class="material-icons">search</i>
+    </div>
+    <input type="text" placeholder="START TYPING...">
+    <div class="close-search">
+        <i class="material-icons">close</i>
+    </div>
+</div>
+<!-- #END# Search Bar -->
+<!-- Top Bar -->
+<nav class="navbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="javascript:void(0);" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false"></a>
+            <a href="javascript:void(0);" class="bars"></a>
+            <a class="navbar-brand" href="index.html">STRAIGHT BUILDING-GESTION CHANTIER</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <!-- Call Search -->
+                <li><a href="javascript:void(0);" class="js-search" data-close="true"><i class="material-icons">search</i></a></li>
+                <!-- #END# Call Search -->
+                <!-- Notifications -->
+                <li class="dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        <i class="material-icons">notifications</i>
+                        <span class="label-count">7</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header">NOTIFICATIONS</li>
+                        <li class="body">
+                            <ul class="menu">
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <div class="icon-circle bg-light-green">
+                                            <i class="material-icons">person_add</i>
+                                        </div>
+                                        <div class="menu-info">
+                                            <h4>12 new members joined</h4>
+                                            <p>
+                                                <i class="material-icons">access_time</i> 14 mins ago
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <div class="icon-circle bg-cyan">
+                                            <i class="material-icons">add_shopping_cart</i>
+                                        </div>
+                                        <div class="menu-info">
+                                            <h4>4 sales made</h4>
+                                            <p>
+                                                <i class="material-icons">access_time</i> 22 mins ago
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <div class="icon-circle bg-red">
+                                            <i class="material-icons">delete_forever</i>
+                                        </div>
+                                        <div class="menu-info">
+                                            <h4><b>Nancy Doe</b> deleted account</h4>
+                                            <p>
+                                                <i class="material-icons">access_time</i> 3 hours ago
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <div class="icon-circle bg-orange">
+                                            <i class="material-icons">mode_edit</i>
+                                        </div>
+                                        <div class="menu-info">
+                                            <h4><b>Nancy</b> changed name</h4>
+                                            <p>
+                                                <i class="material-icons">access_time</i> 2 hours ago
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <div class="icon-circle bg-blue-grey">
+                                            <i class="material-icons">comment</i>
+                                        </div>
+                                        <div class="menu-info">
+                                            <h4><b>John</b> commented your post</h4>
+                                            <p>
+                                                <i class="material-icons">access_time</i> 4 hours ago
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <div class="icon-circle bg-light-green">
+                                            <i class="material-icons">cached</i>
+                                        </div>
+                                        <div class="menu-info">
+                                            <h4><b>John</b> updated status</h4>
+                                            <p>
+                                                <i class="material-icons">access_time</i> 3 hours ago
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <div class="icon-circle bg-purple">
+                                            <i class="material-icons">settings</i>
+                                        </div>
+                                        <div class="menu-info">
+                                            <h4>Settings updated</h4>
+                                            <p>
+                                                <i class="material-icons">access_time</i> Yesterday
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="footer">
+                            <a href="javascript:void(0);">View All Notifications</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- #END# Notifications -->
+                <!-- Tasks -->
+                <li class="dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        <i class="material-icons">flag</i>
+                        <span class="label-count">9</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header">TASKS</li>
+                        <li class="body">
+                            <ul class="menu tasks">
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <h4>
+                                            Footer display issue
+                                            <small>32%</small>
+                                        </h4>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-pink" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width: 32%">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <h4>
+                                            Make new buttons
+                                            <small>45%</small>
+                                        </h4>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-cyan" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <h4>
+                                            Create new dashboard
+                                            <small>54%</small>
+                                        </h4>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-teal" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width: 54%">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <h4>
+                                            Solve transition issue
+                                            <small>65%</small>
+                                        </h4>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-orange" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width: 65%">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <h4>
+                                            Answer GitHub questions
+                                            <small>92%</small>
+                                        </h4>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-purple" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width: 92%">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="footer">
+                            <a href="javascript:void(0);">View All Tasks</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- #END# Tasks -->
+                <li class="pull-right"><a href="javascript:void(0);" class="js-right-sidebar" data-close="true"><i class="material-icons">more_vert</i></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- #Top Bar -->
+<section>
+    <!-- Left Sidebar -->
+    <aside id="leftsidebar" class="sidebar">
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="image">
+                <img src="images/user.png" width="48" height="48" alt="User" />
+            </div>
+            <div class="info-container">
+                <div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">John Doe</div>
+                <div class="email">john.doe@example.com</div>
+                <div class="btn-group user-helper-dropdown">
+                    <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
+                    <ul class="dropdown-menu pull-right">
+                        <li><a href="javascript:void(0);"><i class="material-icons">person</i>Profile</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="javascript:void(0);"><i class="material-icons">group</i>Followers</a></li>
+                        <li><a href="javascript:void(0);"><i class="material-icons">shopping_cart</i>Sales</a></li>
+                        <li><a href="javascript:void(0);"><i class="material-icons">favorite</i>Likes</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="javascript:void(0);"><i class="material-icons">input</i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- #User Info -->
+        <!-- Menu -->
+        <div class="menu">
+            <ul class="list">
+                <li class="header">MAIN NAVIGATION</li>
+                <li>
+                    <a href="index.html">
+                        <i class="material-icons">home</i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="chantier.html">
+                        <i class="material-icons">location_city</i>
+                        <span>Chantier</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="ouvrier.html">
+                        <i class="material-icons">engineering</i>
+                        <span>Ouvrier</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="pointage.html">
+                        <i class="material-icons">engineering</i>
+                        <span>Pointage</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <!-- #Menu -->
+        <!-- Footer -->
+        <div class="legal">
+            <div class="copyright">
+                &copy; 2016 - 2017 <a href="javascript:void(0);">AdminBSB - Material Design</a>.
+            </div>
+            <div class="version">
+                <b>Version: </b> 1.0.5
+            </div>
+        </div>
+        <!-- #Footer -->
+    </aside>
+    <!-- #END# Left Sidebar -->
+    <!-- Right Sidebar -->
+    <aside id="rightsidebar" class="right-sidebar">
+        <ul class="nav nav-tabs tab-nav-right" role="tablist">
+            <li role="presentation" class="active"><a href="#skins" data-toggle="tab">SKINS</a></li>
+            <li role="presentation"><a href="#settings" data-toggle="tab">SETTINGS</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active in active" id="skins">
+                <ul class="demo-choose-skin">
+                    <li data-theme="red" class="active">
+                        <div class="red"></div>
+                        <span>Red</span>
+                    </li>
+                    <li data-theme="pink">
+                        <div class="pink"></div>
+                        <span>Pink</span>
+                    </li>
+                    <li data-theme="purple">
+                        <div class="purple"></div>
+                        <span>Purple</span>
+                    </li>
+                    <li data-theme="deep-purple">
+                        <div class="deep-purple"></div>
+                        <span>Deep Purple</span>
+                    </li>
+                    <li data-theme="indigo">
+                        <div class="indigo"></div>
+                        <span>Indigo</span>
+                    </li>
+                    <li data-theme="blue">
+                        <div class="blue"></div>
+                        <span>Blue</span>
+                    </li>
+                    <li data-theme="light-blue">
+                        <div class="light-blue"></div>
+                        <span>Light Blue</span>
+                    </li>
+                    <li data-theme="cyan">
+                        <div class="cyan"></div>
+                        <span>Cyan</span>
+                    </li>
+                    <li data-theme="teal">
+                        <div class="teal"></div>
+                        <span>Teal</span>
+                    </li>
+                    <li data-theme="green">
+                        <div class="green"></div>
+                        <span>Green</span>
+                    </li>
+                    <li data-theme="light-green">
+                        <div class="light-green"></div>
+                        <span>Light Green</span>
+                    </li>
+                    <li data-theme="lime">
+                        <div class="lime"></div>
+                        <span>Lime</span>
+                    </li>
+                    <li data-theme="yellow">
+                        <div class="yellow"></div>
+                        <span>Yellow</span>
+                    </li>
+                    <li data-theme="amber">
+                        <div class="amber"></div>
+                        <span>Amber</span>
+                    </li>
+                    <li data-theme="orange">
+                        <div class="orange"></div>
+                        <span>Orange</span>
+                    </li>
+                    <li data-theme="deep-orange">
+                        <div class="deep-orange"></div>
+                        <span>Deep Orange</span>
+                    </li>
+                    <li data-theme="brown">
+                        <div class="brown"></div>
+                        <span>Brown</span>
+                    </li>
+                    <li data-theme="grey">
+                        <div class="grey"></div>
+                        <span>Grey</span>
+                    </li>
+                    <li data-theme="blue-grey">
+                        <div class="blue-grey"></div>
+                        <span>Blue Grey</span>
+                    </li>
+                    <li data-theme="black">
+                        <div class="black"></div>
+                        <span>Black</span>
+                    </li>
+                </ul>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="settings">
+                <div class="demo-settings">
+                    <p>GENERAL SETTINGS</p>
+                    <ul class="setting-list">
+                        <li>
+                            <span>Report Panel Usage</span>
+                            <div class="switch">
+                                <label><input type="checkbox" checked><span class="lever"></span></label>
+                            </div>
+                        </li>
+                        <li>
+                            <span>Email Redirect</span>
+                            <div class="switch">
+                                <label><input type="checkbox"><span class="lever"></span></label>
+                            </div>
+                        </li>
+                    </ul>
+                    <p>SYSTEM SETTINGS</p>
+                    <ul class="setting-list">
+                        <li>
+                            <span>Notifications</span>
+                            <div class="switch">
+                                <label><input type="checkbox" checked><span class="lever"></span></label>
+                            </div>
+                        </li>
+                        <li>
+                            <span>Auto Updates</span>
+                            <div class="switch">
+                                <label><input type="checkbox" checked><span class="lever"></span></label>
+                            </div>
+                        </li>
+                    </ul>
+                    <p>ACCOUNT SETTINGS</p>
+                    <ul class="setting-list">
+                        <li>
+                            <span>Offline</span>
+                            <div class="switch">
+                                <label><input type="checkbox"><span class="lever"></span></label>
+                            </div>
+                        </li>
+                        <li>
+                            <span>Location Permission</span>
+                            <div class="switch">
+                                <label><input type="checkbox" checked><span class="lever"></span></label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <!-- #END# Right Sidebar -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h4>Gestion de Pointage</h4>
+        </div>
+
+        <div class="row" id="chantiersContainer">
+            <!-- Cartes des chantiers -->
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="modalPointage" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-blue">
+                <h4 class="modal-title" id="modalPointageLabel">Ajouter un tableau de pointage</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="chantierIdModal">
+
+                <div class="form-group">
+                    <label for="dateDebut" class="control-label">Date de début (lundi uniquement) :</label>
+                    <div class="form-line">
+                        <input type="date" class="form-control" id="dateDebut" >
+                    </div>
+                </div>
+
+                <button class="btn bg-blue waves-effect m-b-20" onclick="genererTableauPointage()">
+                    <i class="material-icons">table_chart</i> Générer le tableau
+                </button>
+
+
+
+                <div id="tableauPointageContainer" class="table-responsive">
+                    <!-- Le tableau de pointage sera généré ici -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn bg-grey waves-effect" data-dismiss="modal">FERMER</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour consulter les tableaux existants -->
+<div class="modal fade" id="modalConsultation" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tableaux de pointage existants</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="chantierIdConsultation">
+                <div id="tableauxExistantsContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour afficher un tableau en consultation -->
+<div class="modal fade" id="modalConsultationTableau" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Consultation du tableau de pointage</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="tableauConsultationContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="error-message" class="alert alert-danger" style="display:none;"></div>
+
+<script src="plugins/jquery/jquery.min.js"></script>
+
+<script>
+
+
+
+    function afficherChantiers(chantiers) {
+        var container = document.getElementById("chantiersContainer");
+        container.innerHTML = "";
+
+        chantiers.forEach(function (c) {
+            var chantierCard = document.createElement("div");
+            chantierCard.className = "col-md-4";
+
+            var cardColorClass = c.etat === "TERMINE" ? "bg-green"
+                : c.etat === "EN_COURS" ? "bg-orange"
+                    : c.etat === "PAS_ENCORE" ? "bg-red"
+                        : "bg-grey";
+
+            chantierCard.innerHTML = `
+        <div class="card">
+            <div class="header ${cardColorClass}">
+                <h2 class="m-b-0">${c.nomProjet}</h2>
+                <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()}</small>
+            </div>
+            <div class="body">
+                <button class="btn bg-light-blue waves-effect btn-sm" onclick="ouvrirModalPointage(${c.id})">
+                    <i class="material-icons">calendar_today</i> Ajouter un tableau de pointage
+                </button>
+                <button class="btn bg-purple waves-effect btn-sm" onclick="ouvrirModalConsultation(${c.id})" style="margin-left: 5px;">
+                    <i class="material-icons">view_list</i> Consulter tableaux
+                </button>
+            </div>
+        </div>`;
+            container.appendChild(chantierCard);
+        });
+    }
+
+    function ouvrirModalPointage(chantierId) {
+        $("#chantierIdModal").val(chantierId);
+        $("#dateDebut").val("");
+        $("#tableauPointageContainer").html("");
+        $("#modalPointage").modal("show");
+    }
+
+    function ouvrirModalConsultation(chantierId) {
+        $("#chantierIdConsultation").val(chantierId);
+        $("#tableauxExistantsContainer").html("");
+        $("#modalConsultation").modal("show");
+        chargerTableauxExistants(chantierId);
+    }
+
+    function chargerTableauxExistants(chantierId) {
+        $.getJSON(`http://localhost:8080/api/pointages/tableaux/${chantierId}`)
+            .done(function (data) {
+                afficherTableauxExistants(data);
+            })
+            .fail(function (xhr, status, error) {
+                console.error("Erreur lors du chargement des tableaux:", status, error);
+                $("#tableauxExistantsContainer").html(`<p class="text-danger">Erreur de chargement: ${error}</p>`);
+            });
+    }
+
+    function afficherTableauxExistants(tableaux) {
+        var container = $("#tableauxExistantsContainer");
+        container.html("");
+
+        if (!tableaux || tableaux.length === 0) {
+            container.html('<p class="text-info">Aucun tableau de pointage trouvé pour ce chantier.</p>');
+            return;
+        }
+
+        var html = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Période (15 jours)</th><th>Date de début</th><th>Date de fin</th><th>Actions</th></tr></thead><tbody>';
+
+        tableaux.forEach(function(tableau) {
+            var dateDebut = new Date(tableau.dateDebut);
+            var dateFin = new Date(tableau.dateFin);
+            var semaine = Math.ceil((dateFin - dateDebut) / (1000 * 60 * 60 * 24 * 7));
+
+            html += `<tr>
+            <td>
+                <strong>Période du ${dateDebut.toLocaleDateString()} au ${dateFin.toLocaleDateString()}</strong><br>
+                <small class="text-muted">15 jours de pointage</small>
+            </td>
+            <td>${dateDebut.toLocaleDateString()}</td>
+            <td>${dateFin.toLocaleDateString()}</td>
+            <td>
+                <button class="btn btn-sm bg-blue waves-effect" onclick="consulterTableau(${tableau.chantierId}, '${tableau.dateDebut}', '${tableau.dateFin}')">
+                    <i class="material-icons">visibility</i> Consulter
+                </button>
+                <button class="btn btn-sm bg-orange waves-effect" onclick="modifierTableau(${tableau.chantierId}, '${tableau.dateDebut}', '${tableau.dateFin}')" style="margin-left: 5px;">
+                    <i class="material-icons">edit</i> Modifier
+                </button>
+            </td>
+        </tr>`;
+        });
+
+        html += '</tbody></table></div>';
+        container.html(html);
+    }
+
+    function consulterTableau(chantierId, dateDebut, dateFin) {
+        $("#modalConsultation").modal("hide");
+
+        $.getJSON(`http://localhost:8080/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
+            .done(function (data) {
+                afficherTableauConsultation(data);
+                $("#modalConsultationTableau").modal("show");
+            })
+            .fail(function (xhr, status, error) {
+                console.error("Erreur lors du chargement du tableau:", status, error);
+                swal("Erreur", "Impossible de charger le tableau de pointage", "error");
+            });
+    }
+
+    function modifierTableau(chantierId, dateDebut, dateFin) {
+        $("#modalConsultation").modal("hide");
+        $("#chantierIdModal").val(chantierId);
+        $("#dateDebut").val(dateDebut);
+
+        $.getJSON(`http://localhost:8080/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
+            .done(function (data) {
+                afficherTableauEditable(data);
+                $("#modalPointage").modal("show");
+            })
+            .fail(function (xhr, status, error) {
+                console.error("Erreur lors du chargement du tableau:", status, error);
+                swal("Erreur", "Impossible de charger le tableau de pointage", "error");
+            });
+    }
+
+    function afficherTableauConsultation(tableau) {
+        var html = `<div class="table-responsive"><table class="table table-bordered">
+<thead><tr><th>Ouvrier</th>`;
+
+        tableau.lignesPointage[0].jours.forEach(function (jour) {
+            html += `<th>${new Date(jour.date).toLocaleDateString()}</th>`;
+        });
+
+        html += `<th>Total à payer</th></tr></thead><tbody>`;
+
+        tableau.lignesPointage.forEach(function (ligne) {
+            html += `<tr><td>${ligne.ouvrier.nom} ${ligne.ouvrier.prenom}</td>`;
+            ligne.jours.forEach(function (jour) {
+                var statusClass = jour.present ? "bg-success" : "bg-warning";
+                var statusText = jour.present ? "Présent" : "Absent";
+                var heures = jour.present ? jour.heuresTravaillees : 0;
+                html += `<td class="${statusClass}" style="text-align: center;">
+                <strong>${statusText}</strong><br>
+                <small>${heures}h - ${jour.montantJournalier.toFixed(2)} MAD</small>
+            </td>`;
+            });
+            html += `<td class="text-right"><strong>${ligne.totalAPayer.toFixed(2)} MAD</strong></td></tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+        $("#tableauConsultationContainer").html(html);
+    }
+
+    function genererTableauPointage() {
+        var chantierId = $('#chantierIdModal').val();
+        var dateDebut = $('#dateDebut').val();
+        if (!dateDebut) {
+            swal("Attention", "Veuillez choisir une date de début", "warning");
+            return;
+        }
+
+        var dateDebutObj = new Date(dateDebut);
+        var dateFinObj = new Date(dateDebutObj);
+        dateFinObj.setDate(dateDebutObj.getDate() + 14);
+        var dateFin = dateFinObj.toISOString().split('T')[0];
+
+        $.getJSON(`http://localhost:8080/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
+            .done(function (data) {
+                afficherTableauEditable(data);
+            })
+            .fail(function (xhr, status, error) {
+                console.error("Erreur lors du chargement du tableau:", status, error);
+                $("#tableauPointageContainer").html(`<p class="text-danger">Erreur de chargement: ${error}</p>`);
+            });
+    }
+
+    function afficherTableauEditable(tableau) {
+        var html = `<form id="formPointage"><div class="table-responsive"><table class="table table-bordered">
+<thead><tr><th>Ouvrier</th>`;
+
+        tableau.lignesPointage[0].jours.forEach(function (jour) {
+            html += `<th>${new Date(jour.date).toLocaleDateString()}</th>`;
+        });
+
+        html += `</tr></thead><tbody>`;
+
+        tableau.lignesPointage.forEach(function (ligne, i) {
+            html += `<tr><td>${ligne.ouvrier.nom} ${ligne.ouvrier.prenom}</td>`;
+            ligne.jours.forEach(function (jour, j) {
+                var id = `chk-${i}-${j}`;
+                var checked = jour.present ? "checked" : "";
+                html += `<td class="text-center">
+            <input type="checkbox" id="${id}" class="filled-in chk-col-blue" ${checked}
+                data-ouvrier-id="${ligne.ouvrier.id}"
+                data-date="${jour.date}"
+                data-pointage-id="${jour.pointageId || ''}"
+                data-chantier-id="${tableau.chantierId}">
+            <label for="${id}"></label>
+        </td>`;
+            });
+            html += `</tr>`;
+        });
+
+        html += `</tbody></table></div></form>
+     <div class="text-right">
+        <button class="btn bg-green waves-effect" onclick="enregistrerPointage()">Enregistrer</button>
+     </div>`;
+
+        $("#tableauPointageContainer").html(html);
+    }
+
+    function enregistrerPointage() {
+        console.log("Début de l'enregistrement du pointage");
+
+        var checkboxes = $('#formPointage input[type=checkbox]');
+        var chantierId = parseInt($('#chantierIdModal').val());
+        var map = new Map();
+
+        // Validation du chantier ID
+        if (!chantierId || isNaN(chantierId)) {
+            swal("Erreur", "ID du chantier invalide", "error");
+            return;
+        }
+
+        checkboxes.each(function () {
+            var chk = $(this)[0];
+            var ouvrierId = parseInt(chk.dataset.ouvrierId);
+            var date = chk.dataset.date;
+            var pointageId = chk.dataset.pointageId ? parseInt(chk.dataset.pointageId) : null;
+
+            // Validation des données
+            if (!ouvrierId || isNaN(ouvrierId)) {
+                console.error("ID ouvrier invalide:", chk.dataset.ouvrierId);
+                return;
+            }
+            if (!date) {
+                console.error("Date invalide:", date);
+                return;
+            }
+
+            var key = ouvrierId + "-" + chantierId;
+            if (!map.has(key)) {
+                map.set(key, {
+                    ouvrierId: ouvrierId,
+                    chantierId: chantierId,
+                    jours: []
+                });
+            }
+
+            map.get(key).jours.push({
+                date: date,
+                present: chk.checked,
+                heuresTravaillees: chk.checked ? 9.0 : 0.0,
+                pointageId: pointageId,
+                montantJournalier: 0.0,
+                chantierId: chantierId,
+                ouvrierId: ouvrierId
+            });
+        });
+
+        var lignesPointage = [];
+        map.forEach(function(data, key) {
+            lignesPointage.push({
+                ouvrier: {
+                    id: data.ouvrierId
+                },
+                chantier: {
+                    id: data.chantierId
+                },
+                jours: data.jours,
+                prixHeure: 0.0,
+                prixJour: 0.0,
+                totalAPayer: 0.0
+            });
+        });
+
+        var dateDebut = $('#dateDebut').val();
+        var dateDebutObj = new Date(dateDebut);
+        var dateFinObj = new Date(dateDebutObj);
+        dateFinObj.setDate(dateDebutObj.getDate() + 14);
+        var dateFin = dateFinObj.toISOString().split("T")[0];
+
+        var body = {
+            chantierId: chantierId,
+            dateDebut: dateDebut,
+            dateFin: dateFin,
+            lignesPointage: lignesPointage
+        };
+
+        console.log("Données à envoyer:", JSON.stringify(body, null, 2));
+
+        $.ajax({
+            url: 'http://localhost:8080/api/pointages/tableau',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(body),
+            beforeSend: function() {
+                console.log("Envoi de la requête en cours...");
+            },
+            success: function (response) {
+                console.log("Réponse du serveur:", response);
+                swal("Succès", "Pointage enregistré !", "success");
+                $('#modalPointage').modal('hide');
+            },
+            error: function (xhr, status, error) {
+                console.error("Erreur détaillée:", {
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    responseText: xhr.responseText,
+                    error: error
+                });
+
+                var errorMessage = "Erreur lors de l'enregistrement";
+                if (xhr.responseText) {
+                    try {
+                        var errorResponse = JSON.parse(xhr.responseText);
+                        errorMessage = errorResponse.message || errorResponse.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = xhr.responseText;
+                    }
+                }
+
+                swal("Erreur", errorMessage, "error");
+            }
+        });
+    }
+
+    // Charger les chantiers au démarrage
+    $(function () {
+        $.getJSON("http://localhost:8080/api/chantiers", function (data) {
+            if (data && Array.isArray(data)) {
+                afficherChantiers(data);
+            } else {
+                console.error("Données invalides reçues :", data);
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Erreur de requête : ", textStatus, errorThrown);
+        });
+    });
+
+
+
+
+</script>
+
+
+
+
+
+
+
+<style>
+    .dropdown-menu {
+        background-color: #ffffff;
+        color: #333;
+        padding: 10px;
+        border-radius: 5px;
+        min-width: 200px;
+    }
+
+    .dropdown-menu li {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+
+    .dropdown-menu li:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+</style>
+
+
+<!-- Jquery Core Js -->
+
+<!-- Bootstrap Core Js -->
+<script src="plugins/bootstrap/js/bootstrap.js"></script>
+
+<!-- Select Plugin Js -->
+<script src="plugins/bootstrap-select/js/bootstrap-select.js"></script>
+
+<!-- Slimscroll Plugin Js -->
+<script src="plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
+
+<!-- Waves Effect Plugin Js -->
+<script src="plugins/node-waves/waves.js"></script>
+
+<!-- Jquery CountTo Plugin Js -->
+<script src="plugins/jquery-countto/jquery.countTo.js"></script>
+
+<!-- Morris Plugin Js -->
+<script src="plugins/raphael/raphael.min.js"></script>
+<script src="plugins/morrisjs/morris.js"></script>
+
+<!-- ChartJs -->
+<script src="plugins/chartjs/Chart.bundle.js"></script>
+
+<!-- Flot Charts Plugin Js -->
+<script src="plugins/flot-charts/jquery.flot.js"></script>
+<script src="plugins/flot-charts/jquery.flot.resize.js"></script>
+<script src="plugins/flot-charts/jquery.flot.pie.js"></script>
+<script src="plugins/flot-charts/jquery.flot.categories.js"></script>
+<script src="plugins/flot-charts/jquery.flot.time.js"></script>
+
+<!-- Sparkline Chart Plugin Js -->
+<script src="plugins/jquery-sparkline/jquery.sparkline.js"></script>
+
+<!-- Custom Js -->
+<script src="js/admin.js"></script>
+<script src="js/pages/index.js"></script>
+
+<!-- Demo Js -->
+<script src="js/demo.js"></script>
+</body>
+
+</html>
