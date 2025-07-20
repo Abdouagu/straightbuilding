@@ -1,13 +1,21 @@
 services:
   - type: web
-    name: springboot-construction
+    name: construction-app
     env: java
-    buildCommand: ./mvnw clean install
-    startCommand: java -jar target/construction-0.0.1-SNAPSHOT.jar
+    plan: free
+    region: oregon
+    buildCommand: "./mvnw clean install"
+    startCommand: "java -jar target/construction-0.0.1-SNAPSHOT.jar"
     envVars:
       - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://ton-host:5432/construction_db
+        value: jdbc:postgresql://dpg-d1ule8er433s73et5ncg-a:5432/construction_db_0cta
       - key: SPRING_DATASOURCE_USERNAME
-        value: postgres
+        value: construction_db_0cta_user
       - key: SPRING_DATASOURCE_PASSWORD
-        value: 1234
+        value: M8nOAk6JKJh7ZCgQZdRRyt4UF6LOMi9Q
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: SPRING_JPA_SHOW_SQL
+        value: true
+      - key: SPRING_JPA_DATABASE_PLATFORM
+        value: org.hibernate.dialect.PostgreSQLDialect
