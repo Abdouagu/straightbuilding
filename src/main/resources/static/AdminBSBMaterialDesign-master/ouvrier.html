@@ -1101,47 +1101,35 @@
 
     // Fonctions utilitaires pour charger les données de sélection
     function chargerChantiersDansSelect() {
-        fetch('https://straightbuilding.onrender.com/api/chantiers')
+        fetch("https://straightbuilding.onrender.com/api/chantiers")
             .then(response => response.json())
             .then(chantiers => {
-                const selectAjout = document.getElementById('chantier');
-                const selectModif = document.getElementById('modif-chantier');
-
-                [selectAjout, selectModif].forEach(select => {
-                    if (select) {
-                        select.innerHTML = '<option value="">Sélectionner un chantier</option>';
-                        chantiers.forEach(chantier => {
-                            const option = document.createElement('option');
-                            option.value = chantier.id;
-                            option.textContent = chantier.nom;
-                            select.appendChild(option);
-                        });
-                    }
+                const select = document.getElementById("chantierSelect");
+                select.innerHTML = '<option value="">-- Sélectionnez un chantier --</option>';
+                chantiers.forEach(chantier => {
+                    const option = document.createElement("option");
+                    option.value = chantier.id;
+                    option.textContent = chantier.nomProjet;
+                    select.appendChild(option);
                 });
             })
-            .catch(error => console.error('Erreur lors du chargement des chantiers:', error));
+            .catch(error => console.error('Erreur lors de la récupération des chantiers:', error));
     }
 
     function chargerTypesDansSelect() {
-        fetch('https://straightbuilding.onrender.com/api/ouvriers/types')
+        fetch("https://straightbuilding.onrender.com/api/ouvriers/types")
             .then(response => response.json())
             .then(types => {
-                const selectAjout = document.getElementById('type');
-                const selectModif = document.getElementById('modif-type');
-
-                [selectAjout, selectModif].forEach(select => {
-                    if (select) {
-                        select.innerHTML = '<option value="">Sélectionner un type</option>';
-                        types.forEach(type => {
-                            const option = document.createElement('option');
-                            option.value = type;
-                            option.textContent = type;
-                            select.appendChild(option);
-                        });
-                    }
+                const select = document.getElementById("typeSelect");
+                select.innerHTML = '';
+                types.forEach(type => {
+                    const option = document.createElement("option");
+                    option.value = type;
+                    option.textContent = capitalizeFirstLetter(type);
+                    select.appendChild(option);
                 });
             })
-            .catch(error => console.error('Erreur lors du chargement des types:', error));
+            .catch(error => console.error('Erreur lors de la récupération des types:', error));
     }
 
     // Fonctions pour prévisualiser les images avant upload
