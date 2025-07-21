@@ -2,7 +2,7 @@ package com.example.construction.serviceimpl;
 
 import com.example.construction.DTO.UserDTO;
 import com.example.construction.DTO.UserRequestDTO;
-import com.example.construction.entities.user;
+import com.example.construction.entities.User;
 import com.example.construction.repository.Userepo;
 import com.example.construction.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserRequestDTO requestDTO) {
         // Créer une nouvelle entité user à partir du DTO
-        user newUser = new user();
+        User newUser = new User();
         newUser.setUsername(requestDTO.getUsername());
         newUser.setPassword(passwordEncoder.encode(requestDTO.getPassword())); // Crypter le mot de passe
         newUser.setRole(requestDTO.getRole());
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
         newUser.setLast_login(new Date());
 
         // Sauvegarder l'utilisateur
-        user savedUser = userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
 
         // Convertir et retourner le DTO
         return convertToDTO(savedUser);
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
     }
 
     // Méthode utilitaire pour convertir user en UserDTO
-    private UserDTO convertToDTO(user entity) {
+    private UserDTO convertToDTO(User entity) {
         UserDTO dto = new UserDTO();
         dto.setId_user(entity.getId_user());
         dto.setUsername(entity.getUsername());

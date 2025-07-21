@@ -5,14 +5,14 @@ import lombok.*;
 import java.util.Date;
 
 @Entity
-@Table(name="user")
+@Table(name="User")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
 
-public class user {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_user;
