@@ -114,7 +114,7 @@ Version 4.3.4 (2016-02-11)
 	Fixed bug where Chrome would scroll to the editor if there where a empty hash value in document url.
 	Fixed bug where the cache suffix wouldn't work correctly with the importcss plugin.
 	Fixed bug where selection wouldn't work properly on MS Edge on Windows Phone 10.
-	Fixed so adjacent pre blocks gets joined into one pre block since that seems like the user intent.
+	Fixed so adjacent pre blocks gets joined into one pre block since that seems like the appUser intent.
 	Fixed so events gets properly dispatched in shadow dom. Patch provided by Nazar Mokrynskyi.
 Version 4.3.3 (2016-01-14)
 	Added new table_resize_bars configuration setting.  This setting allows you to disable the table resize bars.
@@ -150,7 +150,7 @@ Version 4.3.1 (2015-11-30)
 Version 4.3.0 (2015-11-23)
 	Added new table column/row resize support. Makes it a lot more easy to resize the columns/rows in a table.
 	Added new table inline toolbar. Makes it easier to for example add new rows or columns to a table.
-	Added new notification API. Lets you display floating notifications to the end user.
+	Added new notification API. Lets you display floating notifications to the end appUser.
 	Added new codesample plugin that lets you insert syntax highlighted pre elements into the editor.
 	Added new image_caption to images. Lets you create images with captions using a HTML5 figure/figcaption elements.
 	Added new live previews of embeded videos. Lets you play the video right inside the editor.
@@ -177,11 +177,11 @@ Version 4.2.7 (2015-10-27)
 	Fixed bug where backspace/delete on selected table cells wouldn't add an undo level.
 	Fixed bug where script tags embedded within the editor could sometimes get a mce- prefix prepended to them
 	Fixed bug where validate: false option could produce an error to be thrown from the Serialization step.
-	Fixed bug where inline editing of a table as the root element could let the user delete that table.
+	Fixed bug where inline editing of a table as the root element could let the appUser delete that table.
 	Fixed bug where inline editing of a table as the root element wouldn't properly handle enter key.
 	Fixed bug where inline editing of a table as the root element would normalize the selection incorrectly.
-	Fixed bug where inline editing of a list as the root element could let the user delete that list.
-	Fixed bug where inline editing of a list as the root element could let the user split that list.
+	Fixed bug where inline editing of a list as the root element could let the appUser delete that list.
+	Fixed bug where inline editing of a list as the root element could let the appUser split that list.
 	Fixed bug where resize handles would be rendered on editable root elements such as table.
 Version 4.2.6 (2015-09-28)
 	Added capability to set request headers when using XHRs.
@@ -303,7 +303,7 @@ Version 4.1.8 (2015-03-05)
 	Added new html5 sizes attribute to img elements used together with srcset.
 	Added new elementpath option that makes it possible to disable the element path but keep the statusbar.
 	Added new option table_style_by_css for the table plugin to set table styling with css rather than table attributes.
-	Added new link_assume_external_targets option to prompt the user to prepend http:// prefix if the supplied link does not contain a protocol prefix.
+	Added new link_assume_external_targets option to prompt the appUser to prepend http:// prefix if the supplied link does not contain a protocol prefix.
 	Added new image_prepend_url option to allow a custom base path/url to be added to images.
 	Added new table_appearance_options option to make it possible to disable some options.
 	Added new image_title option to make it possible to alter the title of the image, disabled by default.
@@ -321,7 +321,7 @@ Version 4.1.8 (2015-03-05)
 	Fixed bug where selection needed to be properly normalized on modern IE versions.
 	Fixed bug where Command+Backspace didn't properly delete the whole line of text but the previous word.
 	Fixed bug where UI active states wheren't properly updated on IE if you placed caret within the current range.
-	Fixed bug where delete/backspace on WebKit/Blink would remove span elements created by the user.
+	Fixed bug where delete/backspace on WebKit/Blink would remove span elements created by the appUser.
 	Fixed bug where delete/backspace would produce incorrect results when deleting between two text blocks with br elements.
 	Fixed bug where captions where removed when pasting from MS Office.
 	Fixed bug where lists plugin wouldn't properly remove fully selected nested lists.
@@ -370,7 +370,7 @@ Version 4.1.5 (2014-09-09)
 	Fixed bug where tabfocus wouldn't tab properly to other adjacent editor instances.
 	Fixed bug where the DOMUtils setStyles wouldn't properly removed or update the data-mce-style attribute.
 	Fixed bug where dialog select boxes would be placed incorrectly if document.body wasn't statically positioned.
-	Fixed bug where pasting would sometimes scroll to the top of page if the user was using the autoresize plugin.
+	Fixed bug where pasting would sometimes scroll to the top of page if the appUser was using the autoresize plugin.
 	Fixed bug where caret wouldn't be properly rendered by Chrome when clicking on the iframes documentElement.
 	Fixed so custom images for menubutton/splitbutton can be provided. Patch contributed by Naim Hammadi.
 	Fixed so the default action of windows closing can be prevented by blocking the default action of the close event.

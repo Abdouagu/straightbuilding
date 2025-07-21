@@ -334,7 +334,7 @@ Morris.labelSeries = (dmin, dmax, pxwidth, specName, xLabelFormat) ->
   # if we run out of options, use second-intervals
   if spec is undefined
     spec = Morris.LABEL_SPECS["second"]
-  # check if there's a user-defined formatting function
+  # check if there's a appUser-defined formatting function
   if xLabelFormat
     spec = $.extend({}, spec, {fmt: xLabelFormat})
   # calculate labels

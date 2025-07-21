@@ -9,7 +9,7 @@ It's really easy to customize and usage. You can use for from 320px to large res
 
 Looking for Premium Templates?
 ----------------
-**If you need more features please visit portfolio of mine which page link is [https://themeforest.net/user/gurayyarar/portfolio](http://bit.ly/2oPFpmQ)**
+**If you need more features please visit portfolio of mine which page link is [https://themeforest.net/appUser/gurayyarar/portfolio](http://bit.ly/2oPFpmQ)**
 
 Demo
 ----------------

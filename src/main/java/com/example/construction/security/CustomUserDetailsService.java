@@ -1,6 +1,6 @@
 package com.example.construction.security;
 
-import com.example.construction.entities.user;
+import com.example.construction.entities.AppUser;
 import com.example.construction.repository.Userepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -17,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        user user = userRepository.findByEmail(email)
+        AppUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé avec l'email: " + email));
 
         return User.builder()

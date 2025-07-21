@@ -2,7 +2,7 @@ package com.example.construction.serviceimpl;
 
 import com.example.construction.DTO.UserDTO;
 import com.example.construction.DTO.UserRequestDTO;
-import com.example.construction.entities.User;
+import com.example.construction.entities.AppUser;
 import com.example.construction.repository.Userepo;
 import com.example.construction.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,34 +28,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserRequestDTO requestDTO) {
         // Créer une nouvelle entité user à partir du DTO
-        User newUser = new User();
-        newUser.setUsername(requestDTO.getUsername());
-        newUser.setPassword(passwordEncoder.encode(requestDTO.getPassword())); // Crypter le mot de passe
-        newUser.setRole(requestDTO.getRole());
-        newUser.setEmail(requestDTO.getEmail());
-        newUser.setEnabled(true);
-        newUser.setLast_login(new Date());
+        AppUser newAppUser = new AppUser();
+        newAppUser.setUsername(requestDTO.getUsername());
+        newAppUser.setPassword(passwordEncoder.encode(requestDTO.getPassword())); // Crypter le mot de passe
+        newAppUser.setRole(requestDTO.getRole());
+        newAppUser.setEmail(requestDTO.getEmail());
+        newAppUser.setEnabled(true);
+        newAppUser.setLast_login(new Date());
 
         // Sauvegarder l'utilisateur
-        User savedUser = userRepository.save(newUser);
+        AppUser savedAppUser = userRepository.save(newAppUser);
 
         // Convertir et retourner le DTO
-        return convertToDTO(savedUser);
+        return convertToDTO(savedAppUser);
     }
 
     @Override
     public UserDTO updateUser(int id, UserRequestDTO requestDTO) {
         return userRepository.findById(id)
-                .map(existingUser -> {
-                    existingUser.setUsername(requestDTO.getUsername());
+                .map(existingAppUser -> {
+                    existingAppUser.setUsername(requestDTO.getUsername());
                     if (requestDTO.getPassword() != null && !requestDTO.getPassword().isEmpty()) {
-                        existingUser.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
+                        existingAppUser.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
                     }
-                    existingUser.setRole(requestDTO.getRole());
-                    existingUser.setEmail(requestDTO.getEmail());
-                    existingUser.setEnabled(requestDTO.isEnabled());
+                    existingAppUser.setRole(requestDTO.getRole());
+                    existingAppUser.setEmail(requestDTO.getEmail());
+                    existingAppUser.setEnabled(requestDTO.isEnabled());
 
-                    return convertToDTO(userRepository.save(existingUser));
+                    return convertToDTO(userRepository.save(existingAppUser));
                 })
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID: " + id));
     }
@@ -110,22 +110,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateLastLogin(int id) {
-        userRepository.findById(id).ifPresent(user -> {
-            user.setLast_login(new Date());
-            userRepository.save(user);
+        userRepository.findById(id).ifPresent(appUser -> {
+            appUser.setLast_login(new Date());
+            userRepository.save(appUser);
         });
     }
 
     @Override
     public void enableUser(int id, boolean status) {
-        userRepository.findById(id).ifPresent(user -> {
-            user.setEnabled(status);
-            userRepository.save(user);
+        userRepository.findById(id).ifPresent(appUser -> {
+            appUser.setEnabled(status);
+            userRepository.save(appUser);
         });
     }
 
     // Méthode utilitaire pour convertir user en UserDTO
-    private UserDTO convertToDTO(User entity) {
+    private UserDTO convertToDTO(AppUser entity) {
         UserDTO dto = new UserDTO();
         dto.setId_user(entity.getId_user());
         dto.setUsername(entity.getUsername());
