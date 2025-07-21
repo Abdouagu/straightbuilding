@@ -2,7 +2,7 @@ package com.example.construction.DTO;
 
 
 import com.example.construction.entities.role;
-import com.example.construction.entities.user;
+import com.example.construction.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
