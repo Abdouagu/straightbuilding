@@ -767,7 +767,7 @@
 
 <script>
     function voirOuvriersParChantier(chantierId) {
-        fetch(`http://localhost:8080/api/ouvriers/by-chantier/${chantierId}`)
+        fetch(`https://straightbuilding.onrender.com/api/ouvriers/by-chantier/${chantierId}`)
             .then(response => response.json())
             .then(ouvriers => {
                 afficherOuvriers(ouvriers);
@@ -830,7 +830,7 @@
         const cinImg = document.getElementById("detailPhotoCIN");
         const cinError = document.getElementById("cinError");
         if (ouvrier.photoCIN) {
-            const cinUrl = `http://localhost:8080/api/images/cin/${ouvrier.photoCIN}`;
+            const cinUrl = `https://straightbuilding.onrender.com/api/images/cin/${ouvrier.photoCIN}`;
             console.log("Chargement de la photo CIN :", cinUrl);
             cinImg.src = cinUrl;
             cinImg.style.display = "block";
@@ -850,7 +850,7 @@
         const cnssImg = document.getElementById("detailPhotoCNSS");
         const cnssError = document.getElementById("cnssError");
         if (ouvrier.photoCNSS) {
-            const cnssUrl = `http://localhost:8080/api/images/cnss/${ouvrier.photoCNSS}`;
+            const cnssUrl = `https://straightbuilding.onrender.com/api/images/cnss/${ouvrier.photoCNSS}`;
             console.log("Chargement de la photo CNSS :", cnssUrl);
             cnssImg.src = cnssUrl;
             cnssImg.style.display = "block";
@@ -883,7 +883,7 @@
     }
 
     function fetchStats(chantierId) {
-        fetch(`http://localhost:8080/api/ouvriers/stats/by-chantier/${chantierId}`)
+        fetch(`https://straightbuilding.onrender.com/api/ouvriers/stats/by-chantier/${chantierId}`)
             .then(response => response.json())
             .then(stats => {
                 afficherStats(stats);
@@ -970,7 +970,7 @@
         }
 
         // Envoi au backend avec gestion d'erreur améliorée
-        fetch("http://localhost:8080/api/ouvriers", {
+        fetch("https://straightbuilding.onrender.com/api/ouvriers", {
             method: "POST",
             body: formData
         })
@@ -1005,7 +1005,7 @@
     });
 
     function chargerChantiersDansSelect() {
-        fetch("http://localhost:8080/api/chantiers")
+        fetch("https://straightbuilding.onrender.com/api/chantiers")
             .then(response => response.json())
             .then(chantiers => {
                 const select = document.getElementById("chantierSelect");
@@ -1021,7 +1021,7 @@
     }
 
     function chargerTypesDansSelect() {
-        fetch("http://localhost:8080/api/ouvriers/types")
+        fetch("https://straightbuilding.onrender.com/api/ouvriers/types")
             .then(response => response.json())
             .then(types => {
                 const select = document.getElementById("typeSelect");
@@ -1063,7 +1063,7 @@
     }
 
     function voirChantiers() {
-        fetch("http://localhost:8080/api/chantiers")
+        fetch("https://straightbuilding.onrender.com/api/chantiers")
             .then(response => response.json())
             .then(chantiers => {
                 console.log("Réponse reçue :", chantiers);
@@ -1117,7 +1117,7 @@
             `;
             container.appendChild(chantierCard);
 
-            fetch(`http://localhost:8080/api/ouvriers/stats/by-chantier/${c.id}`)
+            fetch(`https://straightbuilding.onrender.com/api/ouvriers/stats/by-chantier/${c.id}`)
                 .then(response => response.json())
                 .then(stats => {
                     const tableCells = Object.entries(stats).map(([type, count]) => {

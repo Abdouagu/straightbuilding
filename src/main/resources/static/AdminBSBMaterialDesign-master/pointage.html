@@ -579,9 +579,6 @@
 <script src="plugins/jquery/jquery.min.js"></script>
 
 <script>
-
-
-
     function afficherChantiers(chantiers) {
         var container = document.getElementById("chantiersContainer");
         container.innerHTML = "";
@@ -629,7 +626,7 @@
     }
 
     function chargerTableauxExistants(chantierId) {
-        $.getJSON(`http://localhost:8080/api/pointages/tableaux/${chantierId}`)
+        $.getJSON(`https://straightbuilding.onrender.com/api/pointages/tableaux/${chantierId}`)
             .done(function (data) {
                 afficherTableauxExistants(data);
             })
@@ -680,7 +677,7 @@
     function consulterTableau(chantierId, dateDebut, dateFin) {
         $("#modalConsultation").modal("hide");
 
-        $.getJSON(`http://localhost:8080/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
+        $.getJSON(`https://straightbuilding.onrender.com/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
             .done(function (data) {
                 afficherTableauConsultation(data);
                 $("#modalConsultationTableau").modal("show");
@@ -696,7 +693,7 @@
         $("#chantierIdModal").val(chantierId);
         $("#dateDebut").val(dateDebut);
 
-        $.getJSON(`http://localhost:8080/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
+        $.getJSON(`https://straightbuilding.onrender.com/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
             .done(function (data) {
                 afficherTableauEditable(data);
                 $("#modalPointage").modal("show");
@@ -748,7 +745,7 @@
         dateFinObj.setDate(dateDebutObj.getDate() + 14);
         var dateFin = dateFinObj.toISOString().split('T')[0];
 
-        $.getJSON(`http://localhost:8080/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
+        $.getJSON(`https://straightbuilding.onrender.com/api/pointages/tableau?chantierId=${chantierId}&dateDebut=${dateDebut}&dateFin=${dateFin}`)
             .done(function (data) {
                 afficherTableauEditable(data);
             })
@@ -874,7 +871,7 @@
         console.log("Données à envoyer:", JSON.stringify(body, null, 2));
 
         $.ajax({
-            url: 'http://localhost:8080/api/pointages/tableau',
+            url: 'https://straightbuilding.onrender.com/api/pointages/tableau',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(body),
@@ -911,7 +908,7 @@
 
     // Charger les chantiers au démarrage
     $(function () {
-        $.getJSON("http://localhost:8080/api/chantiers", function (data) {
+        $.getJSON("https://straightbuilding.onrender.com/api/chantiers", function (data) {
             if (data && Array.isArray(data)) {
                 afficherChantiers(data);
             } else {
@@ -921,10 +918,6 @@
             console.error("Erreur de requête : ", textStatus, errorThrown);
         });
     });
-
-
-
-
 </script>
 
 

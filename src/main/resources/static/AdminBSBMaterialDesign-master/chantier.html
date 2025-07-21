@@ -660,7 +660,7 @@
         let chantierEnCoursId = null;
 
         // Charger les chantiers existants
-        fetch("http://localhost:8080/api/chantiers")
+        fetch("https://straightbuilding.onrender.com/api/chantiers")
             .then(response => response.json())
             .then(chantiers => {
                 chantiers.forEach(chantier => {
@@ -697,7 +697,7 @@
                     console.log("Données à envoyer:", chantier);
 
                     // ✅ Mode édition : PUT
-                    fetch(`http://localhost:8080/api/chantiers/${chantierEnCoursId}`, {
+                    fetch(`https://straightbuilding.onrender.com/api/chantiers/${chantierEnCoursId}`, {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json"
@@ -738,7 +738,7 @@
                         });
                 } else {
                     // ✅ Mode ajout : POST
-                    fetch("http://localhost:8080/api/chantiers", {
+                    fetch("https://straightbuilding.onrender.com/api/chantiers", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -782,7 +782,7 @@
             const card = document.querySelector(`.btn-modifier[data-id='${chantier.id}']`)?.closest(".col-lg-4");
             if (!card) return;
 
-            fetch(`http://localhost:8080/api/clients/${chantier.id_client}`)
+            fetch(`https://straightbuilding.onrender.com/api/clients/${chantier.id_client}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Client non trouvé');
@@ -876,7 +876,7 @@
                     chantierEnCoursId = chantier.id;
 
                     // Récupérer les données actuelles du chantier depuis le serveur
-                    fetch(`http://localhost:8080/api/chantiers/${chantier.id}`)
+                    fetch(`https://straightbuilding.onrender.com/api/chantiers/${chantier.id}`)
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error(`Chantier non trouvé: ${response.status}`);
@@ -905,7 +905,7 @@
                 // 🗑️ Bouton Supprimer
                 document.querySelector(`.btn-supprimer[data-id='${chantier.id}']`).addEventListener("click", () => {
                     if (confirm("Êtes-vous sûr de vouloir supprimer ce chantier ?")) {
-                        fetch(`http://localhost:8080/api/chantiers/${chantier.id}`, {
+                        fetch(`https://straightbuilding.onrender.com/api/chantiers/${chantier.id}`, {
                             method: "DELETE"
                         })
                             .then(response => {
@@ -927,7 +927,7 @@
             if (client) {
                 afficherCarte(client);
             } else {
-                fetch(`http://localhost:8080/api/clients/${chantier.id_client}`)
+                fetch(`https://straightbuilding.onrender.com/api/clients/${chantier.id_client}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Client non trouvé');
@@ -943,7 +943,7 @@
         }
 
         // Charger les clients dans le formulaire
-        fetch("http://localhost:8080/api/clients")
+        fetch("https://straightbuilding.onrender.com/api/clients")
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Erreur lors du chargement des clients');
