@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ouvrier {  // Notez le O majuscule, pour respecter les conventions Java
+public class ouvrier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,27 +29,30 @@ public class ouvrier {  // Notez le O majuscule, pour respecter les conventions 
 
     @Column(name = "date_naissance", nullable = false)
     @Temporal(TemporalType.DATE)
-    private Date dateNaissance;  // Changer en camelCase pour correspondre au DTO
+    private Date dateNaissance;
 
-    @Column(name = "photo_CIN", nullable = false)
-    private String photoCIN;     // Changer en camelCase
+    // Stockage des photos en BYTEA dans PostgreSQL
+    @Lob
+    @Column(name = "photo_cin", columnDefinition = "BYTEA")
+    private byte[] photoCIN;
 
-    @Column(name = "photo_CNSS", nullable = false)
-    private String photoCNSS;    // Changer en camelCase
+    @Lob
+    @Column(name = "photo_cnss", columnDefinition = "BYTEA")
+    private byte[] photoCNSS;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Type type;
 
     @Column(name = "prix_heure", nullable = false)
-    private float prixHeure;     // Changer en camelCase
+    private float prixHeure;
 
     @Column(name = "prix_jour", nullable = false)
-    private float prixJour;      // Changer en camelCase
+    private float prixJour;
 
     @ManyToOne
     @JoinColumn(name = "id_chantier", nullable = false)
-    private chantier chantier;   // Notez le C majuscule
+    private chantier chantier;
 
     @OneToMany(mappedBy = "ouvrier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Pointage> pointages;

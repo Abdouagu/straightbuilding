@@ -3,7 +3,6 @@ package com.example.construction.serviceimpl;
 import com.example.construction.DTO.OuvrierDTO;
 import com.example.construction.entities.Type;
 import com.example.construction.entities.chantier;
-import com.example.construction.entities.client;
 import com.example.construction.entities.ouvrier;
 import com.example.construction.repository.Chantierepo;
 import com.example.construction.repository.Ouvrierepo;
@@ -18,16 +17,15 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-
 public class OuvrierServiceImpl implements OuvrierService {
+
     @Autowired
     private Ouvrierepo ouvrierepo;
 
     @Autowired
     private Chantierepo chantierepo;
 
-
-    private OuvrierDTO convertToDTO (ouvrier ouvrier) {
+    private OuvrierDTO convertToDTO(ouvrier ouvrier) {
         OuvrierDTO ouvrierDTO = new OuvrierDTO();
         ouvrierDTO.setId(ouvrier.getId());
         ouvrierDTO.setNom(ouvrier.getNom());
@@ -40,14 +38,24 @@ public class OuvrierServiceImpl implements OuvrierService {
         ouvrierDTO.setPrixHeure(ouvrier.getPrixHeure());
         ouvrierDTO.setPrixJour(ouvrier.getPrixJour());
 
+        // Génération des URLs pour les images (utiles pour le frontend)
+        if (ouvrier.getId() != null) {
+            if (ouvrier.getPhotoCIN() != null) {
+                ouvrierDTO.setPhotoCINUrl("/api/ouvriers/images/cin/" + ouvrier.getId());
+            }
+            if (ouvrier.getPhotoCNSS() != null) {
+                ouvrierDTO.setPhotoCNSSUrl("/api/ouvriers/images/cnss/" + ouvrier.getId());
+            }
+        }
 
         if (ouvrier.getChantier() != null) {
             ouvrierDTO.setId_chantier(ouvrier.getChantier().getId());
         }
+
         return ouvrierDTO;
     }
 
-    private ouvrier converTOEntity (OuvrierDTO ouvrierDTO) {
+    private ouvrier convertToEntity(OuvrierDTO ouvrierDTO) {
         ouvrier entity = new ouvrier();
         entity.setId(ouvrierDTO.getId());
         entity.setNom(ouvrierDTO.getNom());
@@ -60,27 +68,27 @@ public class OuvrierServiceImpl implements OuvrierService {
         entity.setPrixHeure(ouvrierDTO.getPrixHeure());
         entity.setPrixJour(ouvrierDTO.getPrixJour());
 
-        if (ouvrierDTO.getId_chantier() > 0) {
+        if (ouvrierDTO.getId_chantier() != null && ouvrierDTO.getId_chantier() > 0) {
             chantier chantier = chantierepo.findById(ouvrierDTO.getId_chantier())
                     .orElseThrow(() -> new EntityNotFoundException("Chantier non trouvé avec l'ID: " + ouvrierDTO.getId_chantier()));
             entity.setChantier(chantier);
         }
 
         return entity;
-
     }
 
     @Override
     public OuvrierDTO createOuvrier(OuvrierDTO ouvrierDTO) {
-        ouvrier entity = converTOEntity(ouvrierDTO);
-        return convertToDTO(ouvrierepo.save(entity));
+        ouvrier entity = convertToEntity(ouvrierDTO);
+        ouvrier savedEntity = ouvrierepo.save(entity);
+        return convertToDTO(savedEntity);
     }
 
     @Override
     public OuvrierDTO findOuvrierById(int id) {
-        ouvrier entity=ouvrierepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ouvrier non trouve avec l'ID"+id));
-                return convertToDTO(entity);
+        ouvrier entity = ouvrierepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ouvrier non trouvé avec l'ID " + id));
+        return convertToDTO(entity);
     }
 
     @Override
@@ -93,18 +101,24 @@ public class OuvrierServiceImpl implements OuvrierService {
     @Override
     public OuvrierDTO updateOuvrier(int id, OuvrierDTO ouvrierDTO) {
         ouvrier existingOuvrier = ouvrierepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Chantier non trouvé avec l'ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + id));
 
         // Mise à jour des champs modifiés
         existingOuvrier.setNom(ouvrierDTO.getNom());
         existingOuvrier.setPrenom(ouvrierDTO.getPrenom());
         existingOuvrier.setCin(ouvrierDTO.getCin());
         existingOuvrier.setDateNaissance(ouvrierDTO.getDateNaissance());
-        existingOuvrier.setPhotoCIN(ouvrierDTO.getPhotoCIN());
-        existingOuvrier.setPhotoCNSS(ouvrierDTO.getPhotoCNSS());
         existingOuvrier.setType(ouvrierDTO.getType());
         existingOuvrier.setPrixHeure(ouvrierDTO.getPrixHeure());
         existingOuvrier.setPrixJour(ouvrierDTO.getPrixJour());
+
+        // Mise à jour des photos seulement si de nouvelles données sont fournies
+        if (ouvrierDTO.getPhotoCIN() != null) {
+            existingOuvrier.setPhotoCIN(ouvrierDTO.getPhotoCIN());
+        }
+        if (ouvrierDTO.getPhotoCNSS() != null) {
+            existingOuvrier.setPhotoCNSS(ouvrierDTO.getPhotoCNSS());
+        }
 
         // Mise à jour du chantier si nécessaire
         if (ouvrierDTO.getId_chantier() != null) {
@@ -125,7 +139,6 @@ public class OuvrierServiceImpl implements OuvrierService {
             throw new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + id);
         }
         ouvrierepo.deleteById(id);
-
     }
 
     @Override
@@ -169,11 +182,10 @@ public class OuvrierServiceImpl implements OuvrierService {
 
         Map<String, Integer> stats = new HashMap<>();
         for (OuvrierDTO ouvrier : ouvriers) {
-            String type = ouvrier.getType().name(); // Assure-toi que type n'est pas null
+            String type = ouvrier.getType().name();
             stats.put(type, stats.getOrDefault(type, 0) + 1);
         }
 
         return stats;
     }
-
 }

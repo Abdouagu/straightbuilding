@@ -1,7 +1,7 @@
 package com.example.construction.DTO;
 
 import com.example.construction.entities.Type;
-import com.example.construction.entities.ouvrier;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,11 +19,17 @@ public class OuvrierDTO {
     private String prenom;
     private String cin;
     private Date dateNaissance;
-    private String photoCIN;
-    private String photoCNSS;
+
+    // Pour les transferts, on utilise des byte[] qui seront converties automatiquement
+    private byte[] photoCIN;
+    private byte[] photoCNSS;
+
+    // Pour les URLs de visualisation (utiles pour le frontend)
+    private String photoCINUrl;
+    private String photoCNSSUrl;
+
     private Type type;
     private float prixHeure;
     private float prixJour;
     private Integer id_chantier;
-
 }
