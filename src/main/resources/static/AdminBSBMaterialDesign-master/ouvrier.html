@@ -1164,70 +1164,78 @@
             const statsContainerId = `stats-chantier-${c.id}`;
 
             chantierCard.innerHTML = `
-                <div class="card">
-                    <div class="header ${cardColorClass}">
-                        <h2>
-                            <i class="material-icons">construction</i>
-                            ${c.nomProjet}
-                            <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
-                        </h2>
-                        <ul class="header-dropdown m-r--5">
-                            <li>
-                                <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
-                                    <i class="material-icons">groups</i>
-                                </a>
-                            </li>
-                        </ul>
+            <div class="card">
+                <div class="header ${cardColorClass}">
+                    <h2>
+                        <i class="material-icons">construction</i>
+                        ${c.nomProjet}
+                        <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
+                    </h2>
+                    <ul class="header-dropdown m-r--5">
+                        <li>
+                            <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
+                                <i class="material-icons">groups</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="body">
+                    <div id="${statsContainerId}">
+                        <p>Chargement des statistiques...</p>
                     </div>
-                    <div class="body">
-                        <div id="${statsContainerId}">
-                            <p>Chargement des statistiques...</p>
-                        </div>
-                        <div class="text-right mt-2">
-                            <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
-                                <i class="material-icons">visibility</i> Voir les ouvriers
-                            </button>
-                        </div>
+                    <div class="text-right mt-2">
+                        <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
+                            <i class="material-icons">visibility</i> Voir les ouvriers
+                        </button>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
             container.appendChild(chantierCard);
 
-            fetch(`${API_BASE_URL}/${c.id}`)
-                .then(response => response.json())
+            // CORRECTION ICI : URL complète pour les statistiques
+            fetch(`${API_BASE_URL}/ouvriers/stats/by-chantier/${c.id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
                 .then(stats => {
                     const tableCells = Object.entries(stats).map(([type, count]) => {
                         const label = getLabelByType(type);
                         const color = getColorByType(type);
                         return `
-                        <td style="text-align: center;">
-                            <div style="
-                                width: 52px;
-                                height: 52px;
-                                background-color: ${color};
-                                border-radius: 50%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                margin: 0 auto;
-                                font-size: 20px;
-                                color: white;
-                                font-weight: bold;
-                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                            ">${label}</div>
-                            <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
-                        </td>`;
+                    <td style="text-align: center;">
+                        <div style="
+                            width: 52px;
+                            height: 52px;
+                            background-color: ${color};
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto;
+                            font-size: 20px;
+                            color: white;
+                            font-weight: bold;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        ">${label}</div>
+                        <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
+                    </td>`;
                     }).join("");
 
                     document.getElementById(statsContainerId).innerHTML = `
-                        <table class="table table-bordered" style="width: 100%;">
-                            <tr>${tableCells}</tr>
-                        </table>
-                    `;
+                    <table class="table table-bordered" style="width: 100%;">
+                        <tr>${tableCells}</tr>
+                    </table>
+                `;
                 })
                 .catch(error => {
-                    document.getElementById(statsContainerId).innerHTML = `<p class="text-danger">Erreur lors du chargement des stats</p>`;
                     console.error(`Erreur pour chantier ${c.id}:`, error);
+                    document.getElementById(statsContainerId).innerHTML = `
+                    <p class="text-danger">Erreur lors du chargement des stats: ${error.message}</p>
+                `;
                 });
         });
     }
