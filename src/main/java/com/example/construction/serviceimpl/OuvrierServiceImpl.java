@@ -39,13 +39,13 @@ public class OuvrierServiceImpl implements OuvrierService {
 
         // Pour les images, on génère des URLs pointant vers nos endpoints
         if (ouvrier.getPhotoCINData() != null) {
-            ouvrierDTO.setPhotoCIN("/api/ouvriers/images/cin/" + ouvrier.getId());
+            ouvrierDTO.setPhotoCIN("/ouvriers/images/cin/" + ouvrier.getId());
             ouvrierDTO.setPhotoCINName(ouvrier.getPhotoCINName());
             ouvrierDTO.setPhotoCINType(ouvrier.getPhotoCINType());
         }
 
         if (ouvrier.getPhotoCNSSData() != null) {
-            ouvrierDTO.setPhotoCNSS("/api/ouvriers/images/cnss/" + ouvrier.getId());
+            ouvrierDTO.setPhotoCNSS("/ouvriers/images/cnss/" + ouvrier.getId());
             ouvrierDTO.setPhotoCNSSName(ouvrier.getPhotoCNSSName());
             ouvrierDTO.setPhotoCNSSType(ouvrier.getPhotoCNSSType());
         }
