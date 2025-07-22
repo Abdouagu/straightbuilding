@@ -955,102 +955,6 @@
         }
     });
 
-    // Gestion de la soumission du formulaire
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById("form-ajout-ouvrier").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const chantierId = document.getElementById("chantierSelect").value;
-
-            if (!chantierId) {
-                alert("Veuillez sélectionner un chantier !");
-                return;
-            }
-
-            // Validation des prix
-            const prixHeureInput = document.querySelector('input[name="prix_heure"]');
-            const prixJourInput = document.querySelector('input[name="prix_jour"]');
-
-            const prixHeure = parseFloat(prixHeureInput.value);
-            const prixJour = parseFloat(prixJourInput.value);
-
-            if (isNaN(prixHeure) || prixHeure <= 0) {
-                alert("Le prix par heure doit être un nombre positif");
-                prixHeureInput.focus();
-                return;
-            }
-
-            if (isNaN(prixJour) || prixJour <= 0) {
-                alert("Le prix par jour doit être un nombre positif");
-                prixJourInput.focus();
-                return;
-            }
-
-            // Formater les prix
-            formData.set("prix_heure", prixHeure.toString());
-            formData.set("prix_jour", prixJour.toString());
-
-            // Log des données
-            console.log("Données envoyées au serveur :");
-            for (let [key, value] of formData.entries()) {
-                if (value instanceof File) {
-                    console.log(key + ":", value.name, value.size, "bytes");
-                } else {
-                    console.log(key + ":", value);
-                }
-            }
-
-            // Correction de la date si nécessaire
-            let dateNaissance = formData.get("date_naissance");
-            if (dateNaissance && dateNaissance.includes('/')) {
-                let parts = dateNaissance.split('/');
-                if (parts.length === 3) {
-                    let formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
-                    formData.set("date_naissance", formattedDate);
-                }
-            }
-
-            // Envoi au backend
-            fetch(`${API_BASE_URL}/ouvriers`, {
-                method: "POST",
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(text || `Erreur HTTP ${response.status}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Réponse du serveur:", data);
-                    alert("Ouvrier ajouté avec succès !");
-                    $('#ajouterOuvrierModal').modal('hide');
-                    this.reset();
-
-                    // Masquer les prévisualisations
-                    document.getElementById("previewCINContainer").style.display = "none";
-                    document.getElementById("previewCNSSContainer").style.display = "none";
-
-                    // Rafraîchir la liste des ouvriers
-                    if (typeof voirOuvriersParChantier === 'function') {
-                        voirOuvriersParChantier(chantierId);
-                    }
-                })
-                .catch(error => {
-                    console.error("Erreur:", error);
-
-                    if (error.message.includes("CIN est déjà utilisé")) {
-                        alert("Un ouvrier avec ce CIN existe déjà!");
-                    } else {
-                        alert("Erreur: " + error.message);
-                    }
-                });
-        });
-    });
-
     function chargerChantiersDansSelect() {
         fetch(`${API_BASE_URL}/chantiers`)
             .then(response => response.json())
@@ -1275,6 +1179,223 @@
                 return "#9C27B0";
             default:
                 return "#9E9E9E";
+        }
+    }
+
+    // 1. Créer une fonction pour rafraîchir les stats d'un chantier spécifique
+    function rafraichirStatsChantier(chantierId) {
+        const statsContainerId = `stats-chantier-${chantierId}`;
+        const statsContainer = document.getElementById(statsContainerId);
+
+        if (!statsContainer) {
+            console.warn(`Container des stats non trouvé pour le chantier ${chantierId}`);
+            return;
+        }
+
+        // Afficher un indicateur de chargement
+        statsContainer.innerHTML = '<p>Mise à jour des statistiques...</p>';
+
+        // Récupérer les nouvelles statistiques
+        fetch(`${API_BASE_URL}/ouvriers/stats/by-chantier/${chantierId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(stats => {
+                const tableCells = Object.entries(stats).map(([type, count]) => {
+                    const label = getLabelByType(type);
+                    const color = getColorByType(type);
+                    return `
+                <td style="text-align: center;">
+                    <div style="
+                        width: 52px;
+                        height: 52px;
+                        background-color: ${color};
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto;
+                        font-size: 20px;
+                        color: white;
+                        font-weight: bold;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        transition: all 0.3s ease;
+                    ">${label}</div>
+                    <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
+                </td>`;
+                }).join("");
+
+                statsContainer.innerHTML = `
+                <table class="table table-bordered" style="width: 100%;">
+                    <tr>${tableCells}</tr>
+                </table>
+            `;
+
+                // Animation pour indiquer la mise à jour
+                statsContainer.style.opacity = '0.7';
+                setTimeout(() => {
+                    statsContainer.style.opacity = '1';
+                }, 200);
+            })
+            .catch(error => {
+                console.error(`Erreur lors de la mise à jour des stats pour le chantier ${chantierId}:`, error);
+                statsContainer.innerHTML = `
+                <p class="text-danger">Erreur lors du chargement des stats: ${error.message}</p>
+            `;
+            });
+    }
+
+    // 2. Modifier la soumission du formulaire d'ajout d'ouvrier
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("form-ajout-ouvrier").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const chantierId = document.getElementById("chantierSelect").value;
+
+            if (!chantierId) {
+                alert("Veuillez sélectionner un chantier !");
+                return;
+            }
+
+            // Validation des prix
+            const prixHeureInput = document.querySelector('input[name="prix_heure"]');
+            const prixJourInput = document.querySelector('input[name="prix_jour"]');
+
+            const prixHeure = parseFloat(prixHeureInput.value);
+            const prixJour = parseFloat(prixJourInput.value);
+
+            if (isNaN(prixHeure) || prixHeure <= 0) {
+                alert("Le prix par heure doit être un nombre positif");
+                prixHeureInput.focus();
+                return;
+            }
+
+            if (isNaN(prixJour) || prixJour <= 0) {
+                alert("Le prix par jour doit être un nombre positif");
+                prixJourInput.focus();
+                return;
+            }
+
+            // Formater les prix
+            formData.set("prix_heure", prixHeure.toString());
+            formData.set("prix_jour", prixJour.toString());
+
+            // Log des données
+            console.log("Données envoyées au serveur :");
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(key + ":", value.name, value.size, "bytes");
+                } else {
+                    console.log(key + ":", value);
+                }
+            }
+
+            // Correction de la date si nécessaire
+            let dateNaissance = formData.get("date_naissance");
+            if (dateNaissance && dateNaissance.includes('/')) {
+                let parts = dateNaissance.split('/');
+                if (parts.length === 3) {
+                    let formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+                    formData.set("date_naissance", formattedDate);
+                }
+            }
+
+            // Envoi au backend
+            fetch(`${API_BASE_URL}/ouvriers`, {
+                method: "POST",
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || `Erreur HTTP ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Réponse du serveur:", data);
+                    alert("Ouvrier ajouté avec succès !");
+                    $('#ajouterOuvrierModal').modal('hide');
+                    this.reset();
+
+                    // Masquer les prévisualisations
+                    document.getElementById("previewCINContainer").style.display = "none";
+                    document.getElementById("previewCNSSContainer").style.display = "none";
+
+                    // NOUVELLE FONCTIONNALITÉ : Rafraîchir automatiquement les stats du chantier
+                    rafraichirStatsChantier(chantierId);
+
+                    // Si le modal des ouvriers est ouvert, le rafraîchir aussi
+                    if ($('#ouvriersModal').hasClass('show')) {
+                        voirOuvriersParChantier(chantierId);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur:", error);
+
+                    if (error.message.includes("CIN est déjà utilisé")) {
+                        alert("Un ouvrier avec ce CIN existe déjà!");
+                    } else {
+                        alert("Erreur: " + error.message);
+                    }
+                });
+        });
+    });
+
+    // 3. Fonction utilitaire pour rafraîchir toutes les stats (optionnel)
+    function rafraichirToutesLesStats() {
+        // Récupérer tous les containers de stats visibles
+        const statsContainers = document.querySelectorAll('[id^="stats-chantier-"]');
+
+        statsContainers.forEach(container => {
+            const chantierId = container.id.replace('stats-chantier-', '');
+            rafraichirStatsChantier(parseInt(chantierId));
+        });
+    }
+
+    // 4. Modifier aussi les autres actions qui peuvent affecter les stats
+    function supprimerOuvrier(ouvrierId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet ouvrier ?')) {
+            // D'abord récupérer les infos de l'ouvrier pour connaître son chantier
+            fetch(`${API_BASE_URL}/ouvriers/${ouvrierId}`)
+                .then(response => response.json())
+                .then(ouvrier => {
+                    const chantierId = ouvrier.id_chantier;
+
+                    // Supprimer l'ouvrier
+                    return fetch(`${API_BASE_URL}/ouvriers/${ouvrierId}`, {
+                        method: 'DELETE'
+                    }).then(response => {
+                        if (response.ok) {
+                            alert('Ouvrier supprimé avec succès');
+                            // Rafraîchir les stats du chantier
+                            rafraichirStatsChantier(chantierId);
+                            // Rafraîchir la liste des ouvriers si elle est ouverte
+                            if ($('#ouvriersModal').hasClass('show')) {
+                                voirOuvriersParChantier(chantierId);
+                            }
+                        } else {
+                            throw new Error('Erreur lors de la suppression');
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la suppression de l\'ouvrier');
+                });
+        }
+    }
+
+    function dissocierOuvrier(ouvrierId) {
+        if (confirm('Êtes-vous sûr de vouloir dissocier cet ouvrier du chantier ?')) {
+            // Logique de dissociation ici...
+            // Après la dissociation, rafraîchir les stats
+            // rafraichirStatsChantier(chantierId);
         }
     }
 
