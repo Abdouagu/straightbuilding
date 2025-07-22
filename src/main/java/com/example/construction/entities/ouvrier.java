@@ -3,6 +3,7 @@ package com.example.construction.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 import java.util.Date;
 import java.util.List;
 
@@ -31,10 +32,9 @@ public class ouvrier {
     @Temporal(TemporalType.DATE)
     private Date dateNaissance;
 
-    // Solution 1: Utiliser @Lob sans columnDefinition
-    @Lob
+    // Solution 2: Configuration spécifique pour PostgreSQL
+    @Column(name = "photo_cin_data", columnDefinition = "oid")
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "photo_cin_data")
     private byte[] photoCINData;
 
     @Column(name = "photo_cin_name")
@@ -43,9 +43,8 @@ public class ouvrier {
     @Column(name = "photo_cin_type")
     private String photoCINType;
 
-    @Lob
+    @Column(name = "photo_cnss_data", columnDefinition = "oid")
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "photo_cnss_data")
     private byte[] photoCNSSData;
 
     @Column(name = "photo_cnss_name")
