@@ -31,9 +31,10 @@ public class ouvrier {
     @Temporal(TemporalType.DATE)
     private Date dateNaissance;
 
-    // Changement: stocker les images comme BYTEA
+    // Solution 1: Utiliser @Lob sans columnDefinition
     @Lob
-    @Column(name = "photo_cin_data", columnDefinition = "BYTEA")
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "photo_cin_data")
     private byte[] photoCINData;
 
     @Column(name = "photo_cin_name")
@@ -43,7 +44,8 @@ public class ouvrier {
     private String photoCINType;
 
     @Lob
-    @Column(name = "photo_cnss_data", columnDefinition = "BYTEA")
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "photo_cnss_data")
     private byte[] photoCNSSData;
 
     @Column(name = "photo_cnss_name")
