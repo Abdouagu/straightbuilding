@@ -20,16 +20,19 @@ public class OuvrierDTO {
     private String cin;
     private Date dateNaissance;
 
-    // Pour les transferts, on utilise des byte[] qui seront converties automatiquement
-    private byte[] photoCIN;
-    private byte[] photoCNSS;
+    // Pour les photos, on garde des références pour l'affichage
+    private String photoCIN; // URL pour récupérer l'image
+    private String photoCNSS; // URL pour récupérer l'image
 
-    // Pour les URLs de visualisation (utiles pour le frontend)
-    private String photoCINUrl;
-    private String photoCNSSUrl;
+    // Ajout des métadonnées des photos
+    private String photoCINName;
+    private String photoCINType;
+    private String photoCNSSName;
+    private String photoCNSSType;
 
     private Type type;
     private float prixHeure;
     private float prixJour;
     private Integer id_chantier;
+
 }

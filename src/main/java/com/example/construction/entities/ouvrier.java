@@ -31,14 +31,26 @@ public class ouvrier {
     @Temporal(TemporalType.DATE)
     private Date dateNaissance;
 
-    // Stockage des photos en BYTEA dans PostgreSQL
+    // Changement: stocker les images comme BYTEA
     @Lob
-    @Column(name = "photo_cin", columnDefinition = "BYTEA")
-    private byte[] photoCIN;
+    @Column(name = "photo_cin_data", columnDefinition = "BYTEA")
+    private byte[] photoCINData;
+
+    @Column(name = "photo_cin_name")
+    private String photoCINName;
+
+    @Column(name = "photo_cin_type")
+    private String photoCINType;
 
     @Lob
-    @Column(name = "photo_cnss", columnDefinition = "BYTEA")
-    private byte[] photoCNSS;
+    @Column(name = "photo_cnss_data", columnDefinition = "BYTEA")
+    private byte[] photoCNSSData;
+
+    @Column(name = "photo_cnss_name")
+    private String photoCNSSName;
+
+    @Column(name = "photo_cnss_type")
+    private String photoCNSSType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

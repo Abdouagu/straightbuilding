@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,28 +64,6 @@ public class OuvrierController {
                         .body("Erreur : Ce CIN est déjà utilisé.");
             }
 
-            // Traitement des fichiers photos - conversion en byte[]
-            byte[] photoCINBytes = null;
-            byte[] photoCNSSBytes = null;
-
-            if (photoCINFile != null && !photoCINFile.isEmpty()) {
-                try {
-                    photoCINBytes = photoCINFile.getBytes();
-                    System.out.println("Photo CIN uploadée, taille: " + photoCINBytes.length + " bytes");
-                } catch (IOException e) {
-                    return ResponseEntity.badRequest().body("Erreur lors de la lecture du fichier CIN");
-                }
-            }
-
-            if (photoCNSSFile != null && !photoCNSSFile.isEmpty()) {
-                try {
-                    photoCNSSBytes = photoCNSSFile.getBytes();
-                    System.out.println("Photo CNSS uploadée, taille: " + photoCNSSBytes.length + " bytes");
-                } catch (IOException e) {
-                    return ResponseEntity.badRequest().body("Erreur lors de la lecture du fichier CNSS");
-                }
-            }
-
             // Créer le DTO
             OuvrierDTO dto = new OuvrierDTO();
             dto.setNom(nom);
@@ -97,11 +74,23 @@ public class OuvrierController {
             dto.setPrixHeure(prixHeure);
             dto.setPrixJour(prixJour);
             dto.setId_chantier(idChantier);
-            dto.setPhotoCIN(photoCINBytes);
-            dto.setPhotoCNSS(photoCNSSBytes);
 
-            // Appeler le service
-            OuvrierDTO created = ouvrierService.createOuvrier(dto);
+            // Traitement des photos - stockage en base
+            if (photoCINFile != null && !photoCINFile.isEmpty()) {
+                dto.setPhotoCINName(photoCINFile.getOriginalFilename());
+                dto.setPhotoCINType(photoCINFile.getContentType());
+            }
+
+            if (photoCNSSFile != null && !photoCNSSFile.isEmpty()) {
+                dto.setPhotoCNSSName(photoCNSSFile.getOriginalFilename());
+                dto.setPhotoCNSSType(photoCNSSFile.getContentType());
+            }
+
+            System.out.println("Contrôleur - prixHeure avant service: " + dto.getPrixHeure());
+            System.out.println("Contrôleur - prixJour avant service: " + dto.getPrixJour());
+
+            // Appeler le service avec les fichiers
+            OuvrierDTO created = ouvrierService.createOuvrierWithFiles(dto, photoCINFile, photoCNSSFile);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
 
@@ -112,36 +101,50 @@ public class OuvrierController {
         }
     }
 
-    // Endpoint pour récupérer les images
-    @GetMapping("/images/cin/{id}")
-    public ResponseEntity<byte[]> getCINImage(@PathVariable Integer id) {
+    // Nouveau endpoint pour récupérer les images
+    @GetMapping("/images/cin/{ouvrierId}")
+    public ResponseEntity<byte[]> getPhotoCIN(@PathVariable int ouvrierId) {
         try {
-            OuvrierDTO ouvrier = ouvrierService.findOuvrierById(id);
-            if (ouvrier.getPhotoCIN() != null) {
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.IMAGE_JPEG); // ou MediaType.IMAGE_PNG selon vos besoins
-                return ResponseEntity.ok().headers(headers).body(ouvrier.getPhotoCIN());
-            } else {
+            byte[] imageData = ouvrierService.getPhotoCINData(ouvrierId);
+            String contentType = ouvrierService.getPhotoCINType(ouvrierId);
+
+            if (imageData == null) {
                 return ResponseEntity.notFound().build();
             }
+
+            HttpHeaders headers = new HttpHeaders();
+            if (contentType != null) {
+                headers.setContentType(MediaType.parseMediaType(contentType));
+            } else {
+                headers.setContentType(MediaType.IMAGE_JPEG); // par défaut
+            }
+
+            return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping("/images/cnss/{id}")
-    public ResponseEntity<byte[]> getCNSSImage(@PathVariable Integer id) {
+    @GetMapping("/images/cnss/{ouvrierId}")
+    public ResponseEntity<byte[]> getPhotoCNSS(@PathVariable int ouvrierId) {
         try {
-            OuvrierDTO ouvrier = ouvrierService.findOuvrierById(id);
-            if (ouvrier.getPhotoCNSS() != null) {
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.IMAGE_JPEG); // ou MediaType.IMAGE_PNG selon vos besoins
-                return ResponseEntity.ok().headers(headers).body(ouvrier.getPhotoCNSS());
-            } else {
+            byte[] imageData = ouvrierService.getPhotoCNSSData(ouvrierId);
+            String contentType = ouvrierService.getPhotoCNSSType(ouvrierId);
+
+            if (imageData == null) {
                 return ResponseEntity.notFound().build();
             }
+
+            HttpHeaders headers = new HttpHeaders();
+            if (contentType != null) {
+                headers.setContentType(MediaType.parseMediaType(contentType));
+            } else {
+                headers.setContentType(MediaType.IMAGE_JPEG); // par défaut
+            }
+
+            return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

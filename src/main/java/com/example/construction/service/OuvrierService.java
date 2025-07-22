@@ -2,28 +2,35 @@ package com.example.construction.service;
 
 import com.example.construction.DTO.OuvrierDTO;
 import com.example.construction.entities.Type;
-import com.example.construction.entities.ouvrier;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface OuvrierService {
+
+    // Méthode existante
     OuvrierDTO createOuvrier(OuvrierDTO ouvrierDTO);
+
+    // Nouvelle méthode pour créer avec fichiers
+    OuvrierDTO createOuvrierWithFiles(OuvrierDTO ouvrierDTO, MultipartFile photoCIN, MultipartFile photoCNSS);
+
+    // Nouvelles méthodes pour récupérer les données d'image
+    byte[] getPhotoCINData(int ouvrierId);
+    byte[] getPhotoCNSSData(int ouvrierId);
+    String getPhotoCINType(int ouvrierId);
+    String getPhotoCNSSType(int ouvrierId);
+
+    // Méthodes existantes
     OuvrierDTO findOuvrierById(int id);
     List<OuvrierDTO> getAllOuvriers();
     OuvrierDTO updateOuvrier(int id, OuvrierDTO ouvrierDTO);
     void deleteOuvrier(int id);
-
-    // Méthodes de recherche
     List<OuvrierDTO> findByNom(String nom);
     Optional<OuvrierDTO> findByCin(String cin);
     List<OuvrierDTO> findByType(Type type);
     List<OuvrierDTO> findByChantier(int chantierId);
-
-    // Méthode de vérification
     boolean existsByCin(String cin);
-
     Map<String, Integer> getStatsByChantier(int chantierId);
 }

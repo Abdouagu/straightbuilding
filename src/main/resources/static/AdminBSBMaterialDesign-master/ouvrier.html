@@ -525,12 +525,13 @@
         </div>
     </div>
 </div>
+
 <!-- Modal pour les détails de l'ouvrier -->
 <div class="modal fade" id="ouvrierDetailsModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title"><i class="material-icons">person</i> Détails de l’ouvrier</h4>
+                <h4 class="modal-title"><i class="material-icons">person</i> Détails de l'ouvrier</h4>
                 <button type="button" class="close" data-dismiss="modal">
                     <i class="material-icons">close</i>
                 </button>
@@ -548,12 +549,12 @@
                     <li class="list-group-item"><strong>Prix Jour :</strong> <span id="detailPrixJour">-</span> DH</li>
                     <li class="list-group-item">
                         <strong>Photo CIN :</strong><br>
-                        <img id="existing-cin-preview" style="display:none; max-width: 200px;" />
+                        <img id="detailPhotoCIN" width="100" alt="Photo CIN" style="display: none;" />
                         <span id="cinError" class="text-danger" style="display: none;">Image non disponible</span>
                     </li>
                     <li class="list-group-item">
                         <strong>Photo CNSS :</strong><br>
-                        <img id="existing-cnss-preview" style="display:none; max-width: 200px;" />
+                        <img id="detailPhotoCNSS" width="100" alt="Photo CNSS" style="display: none;" />
                         <span id="cnssError" class="text-danger" style="display: none;">Image non disponible</span>
                     </li>
                 </ul>
@@ -667,7 +668,6 @@
                             </div>
                         </div>
 
-
                         <!-- Sélection du Chantier -->
                         <div class="form-group" >
                             <label>Chantier</label>
@@ -682,14 +682,13 @@
                             </div>
                         </div>
 
-
                         <!-- Photo CIN -->
                         <div class="form-group">
                             <label for="photoCIN"><strong>Photo CIN</strong></label>
                             <input type="file" class="form-control-file" id="photoCIN" name="photo_CIN" accept="image/*"
                                    onchange="previewImageWithCancel(this, '#previewCIN', '#previewCINContainer')">
                             <div style="position: relative; display: none; width: 120px;" id="previewCINContainer">
-                                <img id="cin-preview" style="display:none; max-width: 200px;" />
+                                <img id="previewCIN" src="#" alt="Prévisualisation CIN" style="width: 100%; margin-top: 10px;">
                                 <button type="button" onclick="removeImage('#photoCIN', '#previewCINContainer')"
                                         style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px;">
                                     &times;
@@ -697,14 +696,13 @@
                             </div>
                         </div>
 
-
                         <!-- Photo CNSS -->
                         <div class="form-group">
                             <label for="photoCNSS"><strong>Photo CNSS</strong></label>
                             <input type="file" class="form-control-file" id="photoCNSS" name="photo_CNSS" accept="image/*"
                                    onchange="previewImageWithCancel(this, '#previewCNSS', '#previewCNSSContainer')">
                             <div style="position: relative; display: none; width: 120px;" id="previewCNSSContainer">
-                                <img id="cnss-preview" style="display:none; max-width: 200px;" />
+                                <img id="previewCNSS" src="#" alt="Prévisualisation CNSS" style="width: 100%; margin-top: 10px;">
                                 <button type="button" id="btnRemoveCNSS" onclick="removeImage('#photoCNSS', '#previewCNSSContainer')"
                                         style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px;">
                                     &times;
@@ -730,28 +728,49 @@
     </div>
 </div>
 
+<style>
+    .card-ouvrier {
+        text-align: center;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        margin: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
+    .card-ouvrier img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
 
-<!-- Pour la prévisualisation des images -->
+    .card-ouvrier .nom {
+        font-weight: bold;
+        font-size: 16px;
+    }
 
+    .card-ouvrier .actions button {
+        margin: 5px 3px;
+    }
 
-<img id="modif-cin-preview" style="display:none; max-width: 200px;" />
-<img id="modif-cnss-preview" style="display:none; max-width: 200px;" />
-
-
-
-<!-- Pour les messages de validation CIN -->
-<div id="cin-feedback"></div>
-<div id="modif-cin-feedback"></div>
-
-
-
-
-
+    .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        margin-top: 10px;
+    }
+</style>
 
 <script>
+    // Configuration de l'API
+    const API_BASE_URL = 'https://straightbuilding.onrender.com/api';
+
     function voirOuvriersParChantier(chantierId) {
-        fetch(`https://straightbuilding.onrender.com/api/ouvriers/by-chantier/${chantierId}`)
+        fetch(`${API_BASE_URL}/ouvriers/by-chantier/${chantierId}`)
             .then(response => response.json())
             .then(ouvriers => {
                 afficherOuvriers(ouvriers);
@@ -798,7 +817,7 @@
     }
 
     function voirInfos(ouvrier) {
-        console.log("Données de l'ouvrier sont :", ouvrier);
+        console.log("Données de l'ouvrier :", ouvrier);
 
         // Remplissez les informations textuelles
         document.getElementById("detailNomPrenom").innerText = `${ouvrier.nom} ${ouvrier.prenom}`;
@@ -810,131 +829,84 @@
         document.getElementById("detailPrixHeure").innerText = ouvrier.prixHeure ? `${ouvrier.prixHeure} Dhs/h` : "-";
         document.getElementById("detailPrixJour").innerText = ouvrier.prixJour ? `${ouvrier.prixJour} Dhs/jour` : "-";
 
-        // Gestion de la photo CIN - maintenant via endpoint dédié
+        // Gestion de la photo CIN - CORRECTION DES URLs
         const cinImg = document.getElementById("detailPhotoCIN");
         const cinError = document.getElementById("cinError");
 
-        if (ouvrier.id && ouvrier.photoCIN) {
-            const cinUrl = `https://straightbuilding.onrender.com/api/ouvriers/images/cin/${ouvrier.id}`;
-            console.log("Chargement de la photo CIN depuis BYTEA :", cinUrl);
-            cinImg.src = cinUrl;
-            cinImg.style.display = "block";
-            cinError.style.display = "none";
+        // Réinitialiser l'état
+        cinImg.style.display = "none";
+        cinError.style.display = "none";
+        cinImg.onload = null;
+        cinImg.onerror = null;
+
+        if (ouvrier.photoCIN) {
+            // L'URL est déjà construite côté backend : /api/ouvriers/images/cin/{id}
+            const cinUrl = `${API_BASE_URL}${ouvrier.photoCIN}`;
+            console.log("Chargement de la photo CIN :", cinUrl);
+
+            cinImg.onload = function() {
+                console.log("Photo CIN chargée avec succès");
+                cinImg.style.display = "block";
+                cinError.style.display = "none";
+            };
+
             cinImg.onerror = function () {
                 console.error("Erreur lors du chargement de l'image CIN :", this.src);
                 cinImg.style.display = "none";
                 cinError.style.display = "block";
+                cinError.textContent = "Erreur de chargement de l'image CIN";
             };
+
+            cinImg.src = cinUrl;
         } else {
             console.log("Aucune photo CIN disponible.");
             cinImg.style.display = "none";
             cinError.style.display = "block";
+            cinError.textContent = "Aucune photo CIN disponible";
         }
 
-        // Gestion de la photo CNSS - maintenant via endpoint dédié
+        // Gestion de la photo CNSS - CORRECTION DES URLs
         const cnssImg = document.getElementById("detailPhotoCNSS");
         const cnssError = document.getElementById("cnssError");
 
-        if (ouvrier.id && ouvrier.photoCNSS) {
-            const cnssUrl = `https://straightbuilding.onrender.com/api/ouvriers/images/cnss/${ouvrier.id}`;
-            console.log("Chargement de la photo CNSS depuis BYTEA :", cnssUrl);
-            cnssImg.src = cnssUrl;
-            cnssImg.style.display = "block";
-            cnssError.style.display = "none";
+        // Réinitialiser l'état
+        cnssImg.style.display = "none";
+        cnssError.style.display = "none";
+        cnssImg.onload = null;
+        cnssImg.onerror = null;
+
+        if (ouvrier.photoCNSS) {
+            // L'URL est déjà construite côté backend : /api/ouvriers/images/cnss/{id}
+            const cnssUrl = `${API_BASE_URL}${ouvrier.photoCNSS}`;
+            console.log("Chargement de la photo CNSS :", cnssUrl);
+
+            cnssImg.onload = function() {
+                console.log("Photo CNSS chargée avec succès");
+                cnssImg.style.display = "block";
+                cnssError.style.display = "none";
+            };
+
             cnssImg.onerror = function () {
                 console.error("Erreur lors du chargement de l'image CNSS :", this.src);
                 cnssImg.style.display = "none";
                 cnssError.style.display = "block";
+                cnssError.textContent = "Erreur de chargement de l'image CNSS";
             };
+
+            cnssImg.src = cnssUrl;
         } else {
             console.log("Aucune photo CNSS disponible.");
             cnssImg.style.display = "none";
             cnssError.style.display = "block";
+            cnssError.textContent = "Aucune photo CNSS disponible";
         }
 
         // Affichez le modal
         $('#ouvrierDetailsModal').modal('show');
     }
 
-
-
-
-    function modifierOuvrier(id) {
-        // Charger les données de l'ouvrier pour modification
-        fetch(`https://straightbuilding.onrender.com/api/ouvriers/${id}`)
-            .then(response => response.json())
-            .then(ouvrier => {
-                // Pré-remplir le formulaire de modification avec les données existantes
-                document.getElementById("modif-nom").value = ouvrier.nom;
-                document.getElementById("modif-prenom").value = ouvrier.prenom;
-                document.getElementById("modif-cin").value = ouvrier.cin;
-                document.getElementById("modif-date-naissance").value = ouvrier.dateNaissance ?
-                    new Date(ouvrier.dateNaissance).toISOString().split('T')[0] : '';
-                document.getElementById("modif-type").value = ouvrier.type;
-                document.getElementById("modif-prix-heure").value = ouvrier.prixHeure;
-                document.getElementById("modif-prix-jour").value = ouvrier.prixJour;
-                document.getElementById("modif-chantier").value = ouvrier.id_chantier;
-
-                // Stocker l'ID pour la mise à jour
-                document.getElementById("form-modif-ouvrier").setAttribute("data-ouvrier-id", id);
-
-                // Afficher les images existantes si disponibles
-                const existingCinImg = document.getElementById("existing-cin-preview");
-                const existingCnssImg = document.getElementById("existing-cnss-preview");
-
-                if (ouvrier.photoCIN) {
-                    existingCinImg.src = `https://straightbuilding.onrender.com/api/ouvriers/images/cin/${id}`;
-                    existingCinImg.style.display = "block";
-                } else {
-                    existingCinImg.style.display = "none";
-                }
-
-                if (ouvrier.photoCNSS) {
-                    existingCnssImg.src = `https://straightbuilding.onrender.com/api/ouvriers/images/cnss/${id}`;
-                    existingCnssImg.style.display = "block";
-                } else {
-                    existingCnssImg.style.display = "none";
-                }
-
-                $('#modifierOuvrierModal').modal('show');
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement de l\'ouvrier:', error);
-                alert('Erreur lors du chargement des données de l\'ouvrier');
-            });
-    }
-
-    function supprimerOuvrier(id) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer définitivement cet ouvrier ?")) {
-            fetch(`https://straightbuilding.onrender.com/api/ouvriers/${id}`, {
-                method: 'DELETE'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert("Ouvrier supprimé avec succès");
-                        // Recharger la liste si nécessaire
-                        location.reload();
-                    } else {
-                        throw new Error('Erreur lors de la suppression');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    alert('Erreur lors de la suppression de l\'ouvrier');
-                });
-        }
-    }
-
-    function dissocierOuvrier(id) {
-        if (confirm("Êtes-vous sûr de vouloir dissocier cet ouvrier du chantier ?")) {
-            // Logique pour dissocier l'ouvrier du chantier
-            // Vous devrez peut-être ajouter un endpoint spécifique pour cela
-            alert("Fonctionnalité de dissociation à implémenter");
-        }
-    }
-
     function fetchStats(chantierId) {
-        fetch(`https://straightbuilding.onrender.com/api/ouvriers/stats/by-chantier/${chantierId}`)
+        fetch(`${API_BASE_URL}/ouvriers/stats/by-chantier/${chantierId}`)
             .then(response => response.json())
             .then(stats => {
                 afficherStats(stats);
@@ -944,6 +916,8 @@
 
     function afficherStats(stats) {
         const container = document.getElementById("statsOuvriersContainer");
+        if (!container) return;
+
         container.innerHTML = "";
 
         Object.entries(stats).forEach(([type, count]) => {
@@ -954,154 +928,167 @@
             card.className = "card-stats";
 
             card.innerHTML = `
-            <div class="type">${type}</div>
-            <div class="count">${count}</div>
-        `;
+                <div class="type">${type}</div>
+                <div class="count">${count}</div>
+            `;
 
             col.appendChild(card);
             container.appendChild(col);
         });
     }
 
-    // Gestionnaire pour le bouton d'ajout
-    document.getElementById("btn-ajouter").addEventListener("click", () => {
-        chargerChantiersDansSelect();
-        chargerTypesDansSelect();
-        $('#ajouterOuvrierModal').modal('show');
+    // Vérification du CIN en temps réel
+    document.addEventListener('DOMContentLoaded', function() {
+        const cinInput = document.getElementById('cinInput');
+        const cinFeedback = document.getElementById('cinFeedback');
+
+        if (cinInput) {
+            cinInput.addEventListener('blur', function() {
+                const cin = this.value.trim();
+                if (cin) {
+                    checkCinExists(cin);
+                }
+            });
+        }
     });
 
-    // Gestionnaire pour le formulaire d'ajout
-    document.getElementById("form-ajout-ouvrier").addEventListener("submit", function (e) {
-        e.preventDefault();
+    function checkCinExists(cin) {
+        const cinFeedback = document.getElementById('cinFeedback');
 
-        const formData = new FormData();
-        formData.append('nom', document.getElementById('nom').value);
-        formData.append('prenom', document.getElementById('prenom').value);
-        formData.append('cin', document.getElementById('cin').value);
-        formData.append('date_naissance', document.getElementById('date_naissance').value);
-        formData.append('type', document.getElementById('type').value);
-        formData.append('prix_heure', document.getElementById('prix_heure').value);
-        formData.append('prix_jour', document.getElementById('prix_jour').value);
-        formData.append('id_chantier', document.getElementById('chantier').value);
-
-        // Ajout des fichiers photo
-        const photoCIN = document.getElementById('photo_CIN').files[0];
-        const photoCNSS = document.getElementById('photo_CNSS').files[0];
-
-        if (photoCIN) {
-            formData.append('photo_CIN', photoCIN);
-        }
-        if (photoCNSS) {
-            formData.append('photo_CNSS', photoCNSS);
-        }
-
-        // Afficher un indicateur de chargement
-        const submitBtn = document.querySelector('#form-ajout-ouvrier button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Ajout en cours...';
-        submitBtn.disabled = true;
-
-        fetch('https://straightbuilding.onrender.com/api/ouvriers', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else if (response.status === 409) {
-                    throw new Error('Ce CIN est déjà utilisé');
+        fetch(`${API_BASE_URL}/ouvriers/check-cin/${encodeURIComponent(cin)}`)
+            .then(response => response.json())
+            .then(exists => {
+                if (exists) {
+                    cinFeedback.textContent = "Ce CIN existe déjà !";
+                    cinFeedback.classList.remove('d-none');
+                    cinFeedback.classList.add('text-danger');
                 } else {
-                    return response.text().then(text => {
-                        throw new Error(text || 'Erreur lors de l\'ajout');
-                    });
+                    cinFeedback.classList.add('d-none');
                 }
             })
-            .then(data => {
-                alert('Ouvrier ajouté avec succès !');
-                $('#ajouterOuvrierModal').modal('hide');
-                document.getElementById('form-ajout-ouvrier').reset();
-                // Recharger la page ou mettre à jour la liste
-                location.reload();
-            })
             .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur: ' + error.message);
-            })
-            .finally(() => {
-                // Restaurer le bouton
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
+                console.error('Erreur lors de la vérification du CIN:', error);
+                cinFeedback.classList.add('d-none');
             });
+    }
+
+    // Event listener pour l'ouverture du modal d'ajout
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnAjouter = document.getElementById("btn-ajouter");
+        if (btnAjouter) {
+            btnAjouter.addEventListener("click", () => {
+                chargerChantiersDansSelect();
+                chargerTypesDansSelect();
+                // Réinitialiser le formulaire
+                document.getElementById("form-ajout-ouvrier").reset();
+                // Masquer les prévisualisations
+                document.getElementById("previewCINContainer").style.display = "none";
+                document.getElementById("previewCNSSContainer").style.display = "none";
+                // Masquer les messages d'erreur
+                document.getElementById("cinFeedback").classList.add('d-none');
+                $('#ajouterOuvrierModal').modal('show');
+            });
+        }
     });
 
-    // Gestionnaire pour le formulaire de modification
-    document.getElementById("form-modif-ouvrier").addEventListener("submit", function (e) {
-        e.preventDefault();
+    // Gestion de la soumission du formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("form-ajout-ouvrier").addEventListener("submit", function (e) {
+            e.preventDefault();
 
-        const ouvrierID = this.getAttribute("data-ouvrier-id");
+            const formData = new FormData(this);
+            const chantierId = document.getElementById("chantierSelect").value;
 
-        const formData = new FormData();
-        formData.append('nom', document.getElementById('modif-nom').value);
-        formData.append('prenom', document.getElementById('modif-prenom').value);
-        formData.append('cin', document.getElementById('modif-cin').value);
-        formData.append('date_naissance', document.getElementById('modif-date-naissance').value);
-        formData.append('type', document.getElementById('modif-type').value);
-        formData.append('prix_heure', document.getElementById('modif-prix-heure').value);
-        formData.append('prix_jour', document.getElementById('modif-prix-jour').value);
-        formData.append('id_chantier', document.getElementById('modif-chantier').value);
+            if (!chantierId) {
+                alert("Veuillez sélectionner un chantier !");
+                return;
+            }
 
-        // Ajout des nouveaux fichiers photo si sélectionnés
-        const photoCIN = document.getElementById('modif-photo-CIN').files[0];
-        const photoCNSS = document.getElementById('modif-photo-CNSS').files[0];
+            // Validation des prix
+            const prixHeureInput = document.querySelector('input[name="prix_heure"]');
+            const prixJourInput = document.querySelector('input[name="prix_jour"]');
 
-        if (photoCIN) {
-            formData.append('photo_CIN', photoCIN);
-        }
-        if (photoCNSS) {
-            formData.append('photo_CNSS', photoCNSS);
-        }
+            const prixHeure = parseFloat(prixHeureInput.value);
+            const prixJour = parseFloat(prixJourInput.value);
 
-        // Afficher un indicateur de chargement
-        const submitBtn = document.querySelector('#form-modif-ouvrier button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Modification en cours...';
-        submitBtn.disabled = true;
+            if (isNaN(prixHeure) || prixHeure <= 0) {
+                alert("Le prix par heure doit être un nombre positif");
+                prixHeureInput.focus();
+                return;
+            }
 
-        fetch(`https://straightbuilding.onrender.com/api/ouvriers/${ouvrierID}`, {
-            method: 'PUT',
-            body: formData
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else if (response.status === 409) {
-                    throw new Error('Ce CIN est déjà utilisé par un autre ouvrier');
+            if (isNaN(prixJour) || prixJour <= 0) {
+                alert("Le prix par jour doit être un nombre positif");
+                prixJourInput.focus();
+                return;
+            }
+
+            // Formater les prix
+            formData.set("prix_heure", prixHeure.toString());
+            formData.set("prix_jour", prixJour.toString());
+
+            // Log des données
+            console.log("Données envoyées au serveur :");
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(key + ":", value.name, value.size, "bytes");
                 } else {
-                    return response.text().then(text => {
-                        throw new Error(text || 'Erreur lors de la modification');
-                    });
+                    console.log(key + ":", value);
                 }
+            }
+
+            // Correction de la date si nécessaire
+            let dateNaissance = formData.get("date_naissance");
+            if (dateNaissance && dateNaissance.includes('/')) {
+                let parts = dateNaissance.split('/');
+                if (parts.length === 3) {
+                    let formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+                    formData.set("date_naissance", formattedDate);
+                }
+            }
+
+            // Envoi au backend
+            fetch(`${API_BASE_URL}/ouvriers`, {
+                method: "POST",
+                body: formData
             })
-            .then(data => {
-                alert('Ouvrier modifié avec succès !');
-                $('#modifierOuvrierModal').modal('hide');
-                // Recharger la page ou mettre à jour la liste
-                location.reload();
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur: ' + error.message);
-            })
-            .finally(() => {
-                // Restaurer le bouton
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || `Erreur HTTP ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Réponse du serveur:", data);
+                    alert("Ouvrier ajouté avec succès !");
+                    $('#ajouterOuvrierModal').modal('hide');
+                    this.reset();
+
+                    // Masquer les prévisualisations
+                    document.getElementById("previewCINContainer").style.display = "none";
+                    document.getElementById("previewCNSSContainer").style.display = "none";
+
+                    // Rafraîchir la liste des ouvriers
+                    if (typeof voirOuvriersParChantier === 'function') {
+                        voirOuvriersParChantier(chantierId);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur:", error);
+
+                    if (error.message.includes("CIN est déjà utilisé")) {
+                        alert("Un ouvrier avec ce CIN existe déjà!");
+                    } else {
+                        alert("Erreur: " + error.message);
+                    }
+                });
+        });
     });
 
-    // Fonctions utilitaires pour charger les données de sélection
     function chargerChantiersDansSelect() {
-        fetch("https://straightbuilding.onrender.com/api/chantiers")
+        fetch(`${API_BASE_URL}/chantiers`)
             .then(response => response.json())
             .then(chantiers => {
                 const select = document.getElementById("chantierSelect");
@@ -1117,11 +1104,11 @@
     }
 
     function chargerTypesDansSelect() {
-        fetch("https://straightbuilding.onrender.com/api/ouvriers/types")
+        fetch(`${API_BASE_URL}/ouvriers/types`)
             .then(response => response.json())
             .then(types => {
                 const select = document.getElementById("typeSelect");
-                select.innerHTML = '';
+                select.innerHTML = '<option value="">-- Sélectionnez un type --</option>';
                 types.forEach(type => {
                     const option = document.createElement("option");
                     option.value = type;
@@ -1132,157 +1119,197 @@
             .catch(error => console.error('Erreur lors de la récupération des types:', error));
     }
 
-    // Fonctions pour prévisualiser les images avant upload
-    function previewImage(inputId, previewId) {
-        const input = document.getElementById(inputId);
-        const preview = document.getElementById(previewId);
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function previewImageWithCancel(input, imgSelector, containerSelector) {
+        const container = document.querySelector(containerSelector);
+        const previewImg = document.querySelector(imgSelector);
 
         if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+            const file = input.files[0];
 
-    // Validation des fichiers d'image
-    function validateImageFile(file) {
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-
-        if (!allowedTypes.includes(file.type)) {
-            alert('Type de fichier non autorisé. Utilisez JPG, PNG ou GIF.');
-            return false;
-        }
-
-        if (file.size > maxSize) {
-            alert('Le fichier est trop volumineux. Taille maximale: 5MB.');
-            return false;
-        }
-
-        return true;
-    }
-
-    // Event listeners pour la prévisualisation des images
-    document.addEventListener('DOMContentLoaded', function() {
-        // Pour le formulaire d'ajout
-        const photoCINInput = document.getElementById('photo_CIN');
-        const photoCNSSInput = document.getElementById('photo_CNSS');
-
-        if (photoCINInput) {
-            photoCINInput.addEventListener('change', function() {
-                if (this.files[0] && validateImageFile(this.files[0])) {
-                    previewImage('photo_CIN', 'cin-preview');
-                }
-            });
-        }
-
-        if (photoCNSSInput) {
-            photoCNSSInput.addEventListener('change', function() {
-                if (this.files[0] && validateImageFile(this.files[0])) {
-                    previewImage('photo_CNSS', 'cnss-preview');
-                }
-            });
-        }
-
-        // Pour le formulaire de modification
-        const modifPhotoCINInput = document.getElementById('modif-photo-CIN');
-        const modifPhotoCNSSInput = document.getElementById('modif-photo-CNSS');
-
-        if (modifPhotoCINInput) {
-            modifPhotoCINInput.addEventListener('change', function() {
-                if (this.files[0] && validateImageFile(this.files[0])) {
-                    previewImage('modif-photo-CIN', 'modif-cin-preview');
-                }
-            });
-        }
-
-        if (modifPhotoCNSSInput) {
-            modifPhotoCNSSInput.addEventListener('change', function() {
-                if (this.files[0] && validateImageFile(this.files[0])) {
-                    previewImage('modif-photo-CNSS', 'modif-cnss-preview');
-                }
-            });
-        }
-    });
-
-    // Fonction pour vérifier si un CIN existe déjà
-    function verifierCINExistant(cin, callback) {
-        fetch(`https://straightbuilding.onrender.com/api/ouvriers/check-cin/${cin}`)
-            .then(response => response.json())
-            .then(exists => callback(exists))
-            .catch(error => {
-                console.error('Erreur lors de la vérification du CIN:', error);
-                callback(false);
-            });
-    }
-
-    // Validation en temps réel du CIN
-    document.addEventListener('DOMContentLoaded', function() {
-        const cinInputs = ['cin', 'modif-cin'];
-
-        cinInputs.forEach(inputId => {
-            const input = document.getElementById(inputId);
-            if (input) {
-                let timeout;
-                input.addEventListener('input', function() {
-                    clearTimeout(timeout);
-                    const cin = this.value.trim();
-
-                    if (cin.length >= 5) { // Vérifier seulement si assez de caractères
-                        timeout = setTimeout(() => {
-                            verifierCINExistant(cin, (exists) => {
-                                const feedback = document.getElementById(inputId + '-feedback');
-                                if (feedback) {
-                                    if (exists) {
-                                        feedback.textContent = 'Ce CIN existe déjà';
-                                        feedback.className = 'text-danger';
-                                        input.classList.add('is-invalid');
-                                    } else {
-                                        feedback.textContent = 'CIN disponible';
-                                        feedback.className = 'text-success';
-                                        input.classList.remove('is-invalid');
-                                        input.classList.add('is-valid');
-                                    }
-                                }
-                            });
-                        }, 500); // Attendre 500ms après la dernière frappe
-                    }
-                });
+            // Vérifier la taille du fichier (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Le fichier est trop volumineux (max 5MB)');
+                input.value = '';
+                container.style.display = 'none';
+                return;
             }
+
+            // Vérifier le type de fichier
+            if (!file.type.startsWith('image/')) {
+                alert('Veuillez sélectionner un fichier image');
+                input.value = '';
+                container.style.display = 'none';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImg.src = e.target.result;
+                container.style.display = 'block';
+            };
+            reader.onerror = function() {
+                alert('Erreur lors de la lecture du fichier');
+                input.value = '';
+                container.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    function removeImage(inputSelector, containerSelector) {
+        const input = document.querySelector(inputSelector);
+        const container = document.querySelector(containerSelector);
+        const img = container.querySelector('img');
+
+        input.value = "";
+        img.src = "#";
+        container.style.display = "none";
+    }
+
+    function voirChantiers() {
+        fetch(`${API_BASE_URL}/chantiers`)
+            .then(response => response.json())
+            .then(chantiers => {
+                console.log("Réponse reçue :", chantiers);
+                afficherChantiers(chantiers);
+            })
+            .catch(error => console.error('Erreur lors de la récupération des chantiers:', error));
+    }
+
+    function afficherChantiers(chantiers) {
+        const container = document.getElementById("chantiersContainer");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        chantiers.forEach(c => {
+            const chantierCard = document.createElement("div");
+            chantierCard.className = "col-lg-4 col-md-4 col-sm-6 col-xs-12";
+
+            let cardColorClass = c.etat === "TERMINE" ? "bg-green"
+                : c.etat === "EN_COURS" ? "bg-yellow"
+                    : c.etat === "PAS_ENCORE" ? "bg-red"
+                        : "bg-gray";
+
+            const statsContainerId = `stats-chantier-${c.id}`;
+
+            chantierCard.innerHTML = `
+                <div class="card">
+                    <div class="header ${cardColorClass}">
+                        <h2>
+                            <i class="material-icons">construction</i>
+                            ${c.nomProjet}
+                            <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
+                        </h2>
+                        <ul class="header-dropdown m-r--5">
+                            <li>
+                                <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
+                                    <i class="material-icons">groups</i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="body">
+                        <div id="${statsContainerId}">
+                            <p>Chargement des statistiques...</p>
+                        </div>
+                        <div class="text-right mt-2">
+                            <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
+                                <i class="material-icons">visibility</i> Voir les ouvriers
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(chantierCard);
+
+            fetch(`${API_BASE_URL}/${c.id}`)
+                .then(response => response.json())
+                .then(stats => {
+                    const tableCells = Object.entries(stats).map(([type, count]) => {
+                        const label = getLabelByType(type);
+                        const color = getColorByType(type);
+                        return `
+                        <td style="text-align: center;">
+                            <div style="
+                                width: 52px;
+                                height: 52px;
+                                background-color: ${color};
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin: 0 auto;
+                                font-size: 20px;
+                                color: white;
+                                font-weight: bold;
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            ">${label}</div>
+                            <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
+                        </td>`;
+                    }).join("");
+
+                    document.getElementById(statsContainerId).innerHTML = `
+                        <table class="table table-bordered" style="width: 100%;">
+                            <tr>${tableCells}</tr>
+                        </table>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById(statsContainerId).innerHTML = `<p class="text-danger">Erreur lors du chargement des stats</p>`;
+                    console.error(`Erreur pour chantier ${c.id}:`, error);
+                });
         });
-    });
+    }
+
+    function getLabelByType(type) {
+        switch (type.toLowerCase()) {
+            case "macon":
+            case "maçons":
+                return "MAC";
+            case "greutier":
+            case "greutiers":
+                return "GRT";
+            case "gardien":
+            case "gardiens":
+                return "GAR";
+            case "ouvrier":
+            case "ouvriers":
+                return "OUV";
+            default:
+                return "?";
+        }
+    }
+
+    function getColorByType(type) {
+        switch (type.toLowerCase()) {
+            case "macon":
+            case "macons":
+                return "#4CAF50";
+            case "greutier":
+            case "greutiers":
+                return "#2196F3";
+            case "gardien":
+            case "gardiens":
+                return "#FF9800";
+            case "ouvrier":
+            case "ouvriers":
+                return "#9C27B0";
+            default:
+                return "#9E9E9E";
+        }
+    }
+
+    window.onload = function () {
+        voirChantiers();
+    };
 </script>
-
-<style>
-    .card-ouvrier {
-        text-align: center;
-        padding: 15px;
-        border: 1px solid #eee;
-        border-radius: 12px;
-        margin: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-ouvrier img {
-        width: 105px;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-bottom: 10px;
-    }
-
-    .card-ouvrier .nom {
-        font-weight: bold;
-        font-size: 16px;
-    }
-
-    .card-ouvrier .actions button {
-        margin: 5px 3px;
-    }
-</style>
 
 
 

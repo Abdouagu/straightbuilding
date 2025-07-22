@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,20 +33,21 @@ public class OuvrierServiceImpl implements OuvrierService {
         ouvrierDTO.setPrenom(ouvrier.getPrenom());
         ouvrierDTO.setCin(ouvrier.getCin());
         ouvrierDTO.setDateNaissance(ouvrier.getDateNaissance());
-        ouvrierDTO.setPhotoCIN(ouvrier.getPhotoCIN());
-        ouvrierDTO.setPhotoCNSS(ouvrier.getPhotoCNSS());
         ouvrierDTO.setType(ouvrier.getType());
         ouvrierDTO.setPrixHeure(ouvrier.getPrixHeure());
         ouvrierDTO.setPrixJour(ouvrier.getPrixJour());
 
-        // Génération des URLs pour les images (utiles pour le frontend)
-        if (ouvrier.getId() != null) {
-            if (ouvrier.getPhotoCIN() != null) {
-                ouvrierDTO.setPhotoCINUrl("/api/ouvriers/images/cin/" + ouvrier.getId());
-            }
-            if (ouvrier.getPhotoCNSS() != null) {
-                ouvrierDTO.setPhotoCNSSUrl("/api/ouvriers/images/cnss/" + ouvrier.getId());
-            }
+        // Pour les images, on génère des URLs pointant vers nos endpoints
+        if (ouvrier.getPhotoCINData() != null) {
+            ouvrierDTO.setPhotoCIN("/api/ouvriers/images/cin/" + ouvrier.getId());
+            ouvrierDTO.setPhotoCINName(ouvrier.getPhotoCINName());
+            ouvrierDTO.setPhotoCINType(ouvrier.getPhotoCINType());
+        }
+
+        if (ouvrier.getPhotoCNSSData() != null) {
+            ouvrierDTO.setPhotoCNSS("/api/ouvriers/images/cnss/" + ouvrier.getId());
+            ouvrierDTO.setPhotoCNSSName(ouvrier.getPhotoCNSSName());
+            ouvrierDTO.setPhotoCNSSType(ouvrier.getPhotoCNSSType());
         }
 
         if (ouvrier.getChantier() != null) {
@@ -63,10 +65,14 @@ public class OuvrierServiceImpl implements OuvrierService {
         entity.setCin(ouvrierDTO.getCin());
         entity.setDateNaissance(ouvrierDTO.getDateNaissance());
         entity.setType(ouvrierDTO.getType());
-        entity.setPhotoCIN(ouvrierDTO.getPhotoCIN());
-        entity.setPhotoCNSS(ouvrierDTO.getPhotoCNSS());
         entity.setPrixHeure(ouvrierDTO.getPrixHeure());
         entity.setPrixJour(ouvrierDTO.getPrixJour());
+
+        // Métadonnées des images
+        entity.setPhotoCINName(ouvrierDTO.getPhotoCINName());
+        entity.setPhotoCINType(ouvrierDTO.getPhotoCINType());
+        entity.setPhotoCNSSName(ouvrierDTO.getPhotoCNSSName());
+        entity.setPhotoCNSSType(ouvrierDTO.getPhotoCNSSType());
 
         if (ouvrierDTO.getId_chantier() != null && ouvrierDTO.getId_chantier() > 0) {
             chantier chantier = chantierepo.findById(ouvrierDTO.getId_chantier())
@@ -80,14 +86,74 @@ public class OuvrierServiceImpl implements OuvrierService {
     @Override
     public OuvrierDTO createOuvrier(OuvrierDTO ouvrierDTO) {
         ouvrier entity = convertToEntity(ouvrierDTO);
-        ouvrier savedEntity = ouvrierepo.save(entity);
-        return convertToDTO(savedEntity);
+        return convertToDTO(ouvrierepo.save(entity));
+    }
+
+    @Override
+    public OuvrierDTO createOuvrierWithFiles(OuvrierDTO ouvrierDTO, MultipartFile photoCIN, MultipartFile photoCNSS) {
+        try {
+            ouvrier entity = convertToEntity(ouvrierDTO);
+
+            // Traitement de la photo CIN
+            if (photoCIN != null && !photoCIN.isEmpty()) {
+                entity.setPhotoCINData(photoCIN.getBytes());
+                entity.setPhotoCINName(photoCIN.getOriginalFilename());
+                entity.setPhotoCINType(photoCIN.getContentType());
+                System.out.println("Photo CIN sauvegardée: " + photoCIN.getOriginalFilename() +
+                        ", Taille: " + photoCIN.getBytes().length + " bytes");
+            }
+
+            // Traitement de la photo CNSS
+            if (photoCNSS != null && !photoCNSS.isEmpty()) {
+                entity.setPhotoCNSSData(photoCNSS.getBytes());
+                entity.setPhotoCNSSName(photoCNSS.getOriginalFilename());
+                entity.setPhotoCNSSType(photoCNSS.getContentType());
+                System.out.println("Photo CNSS sauvegardée: " + photoCNSS.getOriginalFilename() +
+                        ", Taille: " + photoCNSS.getBytes().length + " bytes");
+            }
+
+            ouvrier savedEntity = ouvrierepo.save(entity);
+            return convertToDTO(savedEntity);
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la sauvegarde avec fichiers: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la sauvegarde de l'ouvrier avec les fichiers", e);
+        }
+    }
+
+    @Override
+    public byte[] getPhotoCINData(int ouvrierId) {
+        ouvrier entity = ouvrierepo.findById(ouvrierId)
+                .orElseThrow(() -> new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + ouvrierId));
+        return entity.getPhotoCINData();
+    }
+
+    @Override
+    public byte[] getPhotoCNSSData(int ouvrierId) {
+        ouvrier entity = ouvrierepo.findById(ouvrierId)
+                .orElseThrow(() -> new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + ouvrierId));
+        return entity.getPhotoCNSSData();
+    }
+
+    @Override
+    public String getPhotoCINType(int ouvrierId) {
+        ouvrier entity = ouvrierepo.findById(ouvrierId)
+                .orElseThrow(() -> new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + ouvrierId));
+        return entity.getPhotoCINType();
+    }
+
+    @Override
+    public String getPhotoCNSSType(int ouvrierId) {
+        ouvrier entity = ouvrierepo.findById(ouvrierId)
+                .orElseThrow(() -> new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + ouvrierId));
+        return entity.getPhotoCNSSType();
     }
 
     @Override
     public OuvrierDTO findOuvrierById(int id) {
         ouvrier entity = ouvrierepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ouvrier non trouvé avec l'ID " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + id));
         return convertToDTO(entity);
     }
 
@@ -112,24 +178,15 @@ public class OuvrierServiceImpl implements OuvrierService {
         existingOuvrier.setPrixHeure(ouvrierDTO.getPrixHeure());
         existingOuvrier.setPrixJour(ouvrierDTO.getPrixJour());
 
-        // Mise à jour des photos seulement si de nouvelles données sont fournies
-        if (ouvrierDTO.getPhotoCIN() != null) {
-            existingOuvrier.setPhotoCIN(ouvrierDTO.getPhotoCIN());
-        }
-        if (ouvrierDTO.getPhotoCNSS() != null) {
-            existingOuvrier.setPhotoCNSS(ouvrierDTO.getPhotoCNSS());
-        }
-
         // Mise à jour du chantier si nécessaire
         if (ouvrierDTO.getId_chantier() != null) {
             Optional<chantier> chantierOptional = chantierepo.findById(ouvrierDTO.getId_chantier());
             chantierOptional.ifPresent(existingOuvrier::setChantier);
         }
 
-        // Sauvegarde de l'entité mise à jour
-        ouvrier updatedEntity = ouvrierepo.save(existingOuvrier);
+        // Note: Pour mettre à jour les images, il faudrait une méthode séparée avec MultipartFile
 
-        // Retourner le DTO mis à jour
+        ouvrier updatedEntity = ouvrierepo.save(existingOuvrier);
         return convertToDTO(updatedEntity);
     }
 
@@ -178,11 +235,13 @@ public class OuvrierServiceImpl implements OuvrierService {
 
     @Override
     public Map<String, Integer> getStatsByChantier(int chantierId) {
-        List<OuvrierDTO> ouvriers = findByChantier(chantierId);
+        List<ouvrier> ouvriers = ouvrierepo.findByChantier_Id(chantierId);
 
         Map<String, Integer> stats = new HashMap<>();
-        for (OuvrierDTO ouvrier : ouvriers) {
-            String type = ouvrier.getType().name();
+
+        // Compter les ouvriers par type
+        for (ouvrier ouvrier : ouvriers) {
+            String type = ouvrier.getType().toString().toLowerCase();
             stats.put(type, stats.getOrDefault(type, 0) + 1);
         }
 
