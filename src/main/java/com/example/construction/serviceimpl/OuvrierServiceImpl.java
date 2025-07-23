@@ -199,8 +199,6 @@ public class OuvrierServiceImpl implements OuvrierService {
             ouvrier existingOuvrier = ouvrierepo.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Ouvrier non trouvé avec l'ID: " + id));
 
-            System.out.println("Mise à jour de l'ouvrier ID: " + id);
-
             // Mise à jour des champs de base
             existingOuvrier.setNom(ouvrierDTO.getNom());
             existingOuvrier.setPrenom(ouvrierDTO.getPrenom());
@@ -217,43 +215,33 @@ public class OuvrierServiceImpl implements OuvrierService {
                 existingOuvrier.setChantier(chantier);
             }
 
-            // Traitement de la nouvelle photo CIN (si fournie)
+            // Traitement de la photo CIN
             if (photoCIN != null && !photoCIN.isEmpty()) {
                 existingOuvrier.setPhotoCINData(photoCIN.getBytes());
                 existingOuvrier.setPhotoCINName(photoCIN.getOriginalFilename());
                 existingOuvrier.setPhotoCINType(photoCIN.getContentType());
-                System.out.println("Photo CIN mise à jour: " + photoCIN.getOriginalFilename() +
-                        ", Taille: " + photoCIN.getBytes().length + " bytes");
-            }
-            // Si pas de nouveau fichier CIN, garder les métadonnées existantes
-            else if (ouvrierDTO.getPhotoCINName() != null) {
+            } else if (ouvrierDTO.getPhotoCINName() != null) {
+                // Conserver les métadonnées existantes si aucune nouvelle photo n'est fournie
                 existingOuvrier.setPhotoCINName(ouvrierDTO.getPhotoCINName());
                 existingOuvrier.setPhotoCINType(ouvrierDTO.getPhotoCINType());
             }
 
-            // Traitement de la nouvelle photo CNSS (si fournie)
+            // Traitement de la photo CNSS
             if (photoCNSS != null && !photoCNSS.isEmpty()) {
                 existingOuvrier.setPhotoCNSSData(photoCNSS.getBytes());
                 existingOuvrier.setPhotoCNSSName(photoCNSS.getOriginalFilename());
                 existingOuvrier.setPhotoCNSSType(photoCNSS.getContentType());
-                System.out.println("Photo CNSS mise à jour: " + photoCNSS.getOriginalFilename() +
-                        ", Taille: " + photoCNSS.getBytes().length + " bytes");
-            }
-            // Si pas de nouveau fichier CNSS, garder les métadonnées existantes
-            else if (ouvrierDTO.getPhotoCNSSName() != null) {
+            } else if (ouvrierDTO.getPhotoCNSSName() != null) {
+                // Conserver les métadonnées existantes si aucune nouvelle photo n'est fournie
                 existingOuvrier.setPhotoCNSSName(ouvrierDTO.getPhotoCNSSName());
                 existingOuvrier.setPhotoCNSSType(ouvrierDTO.getPhotoCNSSType());
             }
 
             // Sauvegarder
             ouvrier updatedEntity = ouvrierepo.save(existingOuvrier);
-            System.out.println("Ouvrier mis à jour avec succès");
-
             return convertToDTO(updatedEntity);
 
         } catch (Exception e) {
-            System.err.println("Erreur lors de la mise à jour avec fichiers: " + e.getMessage());
-            e.printStackTrace();
             throw new RuntimeException("Erreur lors de la mise à jour de l'ouvrier avec les fichiers", e);
         }
     }

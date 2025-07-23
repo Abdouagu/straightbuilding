@@ -1040,6 +1040,12 @@
             return;
         }
 
+        // Si le champ CIN est vide, ne rien faire
+        if (!cin || cin.trim() === '') {
+            cinFeedback.classList.add('d-none');
+            return;
+        }
+
         fetch(`${API_BASE_URL}/ouvriers/check-cin/${encodeURIComponent(cin)}`)
             .then(response => response.json())
             .then(exists => {
@@ -1287,8 +1293,8 @@
         container.innerHTML = "";
 
         chantiers.forEach(c => {
-            const chantierCard = document.createElement("div");
-            chantierCard.className = "col-lg-4 col-md-4 col-sm-6 col-xs-12";
+            const col = document.createElement("div");
+            col.className = "col-lg-4 col-md-6 col-sm-12 mb-4";
 
             let cardColorClass = c.etat === "TERMINE" ? "bg-green"
                 : c.etat === "EN_COURS" ? "bg-yellow"
@@ -1297,37 +1303,42 @@
 
             const statsContainerId = `stats-chantier-${c.id}`;
 
-            chantierCard.innerHTML = `
-            <div class="card">
-                <div class="header ${cardColorClass}">
-                    <h2>
-                        <i class="material-icons">construction</i>
-                        ${c.nomProjet}
-                        <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
-                    </h2>
-                    <ul class="header-dropdown m-r--5">
-                        <li>
-                            <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
-                                <i class="material-icons">groups</i>
-                            </a>
-                        </li>
-                    </ul>
+            col.innerHTML = `
+        <div class="card h-100">
+            <div class="header ${cardColorClass}">
+                <h2>
+                    <i class="material-icons">construction</i>
+                    ${c.nomProjet}
+                    <small class="d-block">Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
+                </h2>
+                <ul class="header-dropdown m-r--5">
+                    <li>
+                        <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
+                            <i class="material-icons">groups</i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="body d-flex flex-column">
+                <div id="${statsContainerId}" class="flex-grow-1">
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Chargement...</span>
+                        </div>
+                        <p class="text-muted mt-2">Chargement des statistiques...</p>
+                    </div>
                 </div>
-                <div class="body">
-                    <div id="${statsContainerId}">
-                        <p>Chargement des statistiques...</p>
-                    </div>
-                    <div class="text-right mt-2">
-                        <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
-                            <i class="material-icons">visibility</i> Voir les ouvriers
-                        </button>
-                    </div>
+                <div class="text-right mt-2">
+                    <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
+                        <i class="material-icons">visibility</i> Voir les ouvriers
+                    </button>
                 </div>
             </div>
+        </div>
         `;
-            container.appendChild(chantierCard);
+            container.appendChild(col);
 
-            // CORRECTION ICI : URL complète pour les statistiques
+            // Charger les stats
             fetch(`${API_BASE_URL}/ouvriers/stats/by-chantier/${c.id}`)
                 .then(response => {
                     if (!response.ok) {
@@ -1336,44 +1347,50 @@
                     return response.json();
                 })
                 .then(stats => {
+                    const statsElement = document.getElementById(statsContainerId);
+                    if (!statsElement) return;
+
+                    if (Object.keys(stats).length === 0) {
+                        statsElement.innerHTML = `
+                        <div class="text-center py-3">
+                            <i class="material-icons" style="font-size: 48px; color: #ccc;">engineering</i>
+                            <p class="text-muted">Aucun ouvrier sur ce chantier</p>
+                        </div>
+                    `;
+                        return;
+                    }
+
                     const tableCells = Object.entries(stats).map(([type, count]) => {
                         const label = getLabelByType(type);
                         const color = getColorByType(type);
                         return `
                     <td style="text-align: center;">
-                        <div style="
-                            width: 52px;
-                            height: 52px;
-                            background-color: ${color};
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            margin: 0 auto;
-                            font-size: 20px;
-                            color: white;
-                            font-weight: bold;
-                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                        ">${label}</div>
-                        <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
+                        <div class="stat-circle" style="background-color: ${color}">${label}</div>
+                        <div class="stat-count">${count}</div>
                     </td>`;
                     }).join("");
 
-                    document.getElementById(statsContainerId).innerHTML = `
-                    <table class="table table-bordered" style="width: 100%;">
+                    statsElement.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-bordered m-0">
                         <tr>${tableCells}</tr>
                     </table>
+                </div>
                 `;
                 })
                 .catch(error => {
                     console.error(`Erreur pour chantier ${c.id}:`, error);
-                    document.getElementById(statsContainerId).innerHTML = `
+                    const statsElement = document.getElementById(statsContainerId);
+                    if (statsElement) {
+                        statsElement.innerHTML = `
                     <p class="text-danger">Erreur lors du chargement des stats: ${error.message}</p>
-                `;
+                    `;
+                    }
                 });
         });
     }
 
+    // Fonctions utilitaires nécessaires
     function getLabelByType(type) {
         switch (type.toLowerCase()) {
             case "macon":
@@ -1631,14 +1648,6 @@
 </script>
 
 <style>
-    .card-ouvrier {
-        text-align: center;
-        padding: 15px;
-        border: 1px solid #eee;
-        border-radius: 12px;
-        margin: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
 
     .card-ouvrier img {
         width: 100px;
@@ -1664,6 +1673,62 @@
         border-radius: 4px;
         padding: 5px;
         margin-top: 10px;
+    }
+
+    /* Styles pour les cartes chantiers */
+    .card {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .card .header h2 {
+        font-size: 16px;
+        margin: 0;
+        padding: 10px;
+    }
+
+    .card .header h2 small {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .stat-circle {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 20px;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+
+    .stat-count {
+        margin-top: 8px;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    /* Uniformisation des hauteurs */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .row > [class*='col-'] {
+        display: flex;
+        flex-direction: column;
     }
 </style>
 
