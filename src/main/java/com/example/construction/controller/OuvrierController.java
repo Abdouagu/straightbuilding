@@ -101,6 +101,90 @@ public class OuvrierController {
         }
     }
 
+    // NOUVEAU : Endpoint pour modifier un ouvrier avec fichiers
+    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> updateOuvrierWithFiles(
+            @PathVariable int id,
+            @RequestParam("nom") String nom,
+            @RequestParam("prenom") String prenom,
+            @RequestParam("cin") String cin,
+            @RequestParam("date_naissance") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dateNaissance,
+            @RequestParam("type") Type type,
+            @RequestParam("prix_heure") String prixHeureStr,
+            @RequestParam("prix_jour") String prixJourStr,
+            @RequestParam("id_chantier") Integer idChantier,
+            @RequestParam(value = "photo_CIN", required = false) MultipartFile photoCINFile,
+            @RequestParam(value = "photo_CNSS", required = false) MultipartFile photoCNSSFile
+    ) {
+        try {
+            System.out.println("------ Modification ouvrier ID: " + id + " ------");
+            System.out.println("prix_heure (brut): " + prixHeureStr);
+            System.out.println("prix_jour (brut): " + prixJourStr);
+
+            // Vérifier si l'ouvrier existe
+            OuvrierDTO existingOuvrier = ouvrierService.findOuvrierById(id);
+
+            // Convertir les prix
+            float prixHeure;
+            float prixJour;
+
+            try {
+                prixHeure = Float.parseFloat(prixHeureStr.replace(",", "."));
+                prixJour = Float.parseFloat(prixJourStr.replace(",", "."));
+            } catch (NumberFormatException e) {
+                return ResponseEntity.badRequest().body("Les prix doivent être des nombres valides");
+            }
+
+            // Vérifier si le CIN existe déjà (sauf pour l'ouvrier actuel)
+            if (!existingOuvrier.getCin().equals(cin) && ouvrierService.existsByCin(cin)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Erreur : Ce CIN est déjà utilisé par un autre ouvrier.");
+            }
+
+            // Créer le DTO avec les nouvelles données
+            OuvrierDTO dto = new OuvrierDTO();
+            dto.setId(id);
+            dto.setNom(nom);
+            dto.setPrenom(prenom);
+            dto.setCin(cin);
+            dto.setDateNaissance(dateNaissance);
+            dto.setType(type);
+            dto.setPrixHeure(prixHeure);
+            dto.setPrixJour(prixJour);
+            dto.setId_chantier(idChantier);
+
+            // Traitement des photos
+            if (photoCINFile != null && !photoCINFile.isEmpty()) {
+                dto.setPhotoCINName(photoCINFile.getOriginalFilename());
+                dto.setPhotoCINType(photoCINFile.getContentType());
+                System.out.println("Nouvelle photo CIN reçue: " + photoCINFile.getOriginalFilename());
+            }
+
+            if (photoCNSSFile != null && !photoCNSSFile.isEmpty()) {
+                dto.setPhotoCNSSName(photoCNSSFile.getOriginalFilename());
+                dto.setPhotoCNSSType(photoCNSSFile.getContentType());
+                System.out.println("Nouvelle photo CNSS reçue: " + photoCNSSFile.getOriginalFilename());
+            }
+
+            // Appeler le service pour la mise à jour avec fichiers
+            OuvrierDTO updated = ouvrierService.updateOuvrierWithFiles(id, dto, photoCINFile, photoCNSSFile);
+
+            return ResponseEntity.ok(updated);
+
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("non trouvé")) {
+                return ResponseEntity.notFound().build();
+            }
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur serveur : " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur serveur : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        }
+    }
+
     // Nouveau endpoint pour récupérer les images
     @GetMapping("/images/cin/{ouvrierId}")
     public ResponseEntity<byte[]> getPhotoCIN(@PathVariable int ouvrierId) {

@@ -26,6 +26,9 @@ public interface OuvrierService {
     OuvrierDTO findOuvrierById(int id);
     List<OuvrierDTO> getAllOuvriers();
     OuvrierDTO updateOuvrier(int id, OuvrierDTO ouvrierDTO);
+    // Ajoutez cette signature dans votre interface OuvrierService
+
+    OuvrierDTO updateOuvrierWithFiles(int id, OuvrierDTO ouvrierDTO, MultipartFile photoCIN, MultipartFile photoCNSS);
     void deleteOuvrier(int id);
     List<OuvrierDTO> findByNom(String nom);
     Optional<OuvrierDTO> findByCin(String cin);

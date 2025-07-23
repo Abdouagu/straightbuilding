@@ -570,8 +570,8 @@
 
             <!-- HEADER -->
             <div class="modal-header">
-                <h4 class="modal-title">
-                    <i class="material-icons">construction</i> Ajouter un Ouvrier
+                <h4 class="modal-title" id="modalTitle">
+                    <i class="material-icons">construction</i> <span id="modalTitleText">Ajouter un Ouvrier</span>
                 </h4>
                 <button type="button" class="close" data-dismiss="modal">
                     <i class="material-icons">close</i>
@@ -581,6 +581,8 @@
             <!-- BODY -->
             <div class="modal-body">
                 <form id="form-ajout-ouvrier" class="row" enctype="multipart/form-data" method="post">
+                    <!-- Champ caché pour l'ID lors de la modification -->
+                    <input type="hidden" id="ouvrierIdHidden" name="id" value="">
 
                     <!-- COL GAUCHE -->
                     <div class="col-md-6">
@@ -590,7 +592,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">badge</i></span>
                                 <div class="form-line">
-                                    <input type="text" name="nom" class="form-control" required>
+                                    <input type="text" name="nom" id="nomInput" class="form-control" required>
                                 </div>
                             </div>
                         </div>
@@ -601,7 +603,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">person</i></span>
                                 <div class="form-line">
-                                    <input type="text" name="prenom" class="form-control" required>
+                                    <input type="text" name="prenom" id="prenomInput" class="form-control" required>
                                 </div>
                             </div>
                         </div>
@@ -624,7 +626,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">event</i></span>
                                 <div class="form-line">
-                                    <input type="date" name="date_naissance" class="form-control" required>
+                                    <input type="date" name="date_naissance" id="dateNaissanceInput" class="form-control" required>
                                 </div>
                             </div>
                         </div>
@@ -652,7 +654,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">attach_money</i></span>
                                 <div class="form-line">
-                                    <input type="number" name="prix_heure" class="form-control" required>
+                                    <input type="number" name="prix_heure" id="prixHeureInput" class="form-control" required>
                                 </div>
                             </div>
                         </div>
@@ -663,13 +665,13 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">calendar_today</i></span>
                                 <div class="form-line">
-                                    <input type="number" name="prix_jour" class="form-control" required>
+                                    <input type="number" name="prix_jour" id="prixJourInput" class="form-control" required>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Sélection du Chantier -->
-                        <div class="form-group" >
+                        <div class="form-group">
                             <label>Chantier</label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">location_on</i></span>
@@ -694,6 +696,7 @@
                                     &times;
                                 </button>
                             </div>
+                            <small class="form-text text-muted" id="cinActuelleInfo"></small>
                         </div>
 
                         <!-- Photo CNSS -->
@@ -703,18 +706,19 @@
                                    onchange="previewImageWithCancel(this, '#previewCNSS', '#previewCNSSContainer')">
                             <div style="position: relative; display: none; width: 120px;" id="previewCNSSContainer">
                                 <img id="previewCNSS" src="#" alt="Prévisualisation CNSS" style="width: 100%; margin-top: 10px;">
-                                <button type="button" id="btnRemoveCNSS" onclick="removeImage('#photoCNSS', '#previewCNSSContainer')"
+                                <button type="button" onclick="removeImage('#photoCNSS', '#previewCNSSContainer')"
                                         style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px;">
                                     &times;
                                 </button>
                             </div>
+                            <small class="form-text text-muted" id="cnssActuelleInfo"></small>
                         </div>
                     </div>
 
                     <!-- BOUTONS -->
                     <div class="col-12 text-right">
-                        <button type="submit" class="btn btn-success m-t-15 waves-effect">
-                            <i class="material-icons">save</i> Enregistrer
+                        <button type="submit" class="btn btn-success m-t-15 waves-effect" id="btnEnregistrer">
+                            <i class="material-icons">save</i> <span id="btnEnregistrerText">Enregistrer</span>
                         </button>
                         <button type="button" class="btn btn-secondary m-t-15" data-dismiss="modal">
                             <i class="material-icons">cancel</i> Annuler
@@ -732,6 +736,117 @@
 <script>
     // Configuration de l'API
     const API_BASE_URL = 'https://straightbuilding.onrender.com/api';
+
+    // Variables globales pour la gestion du mode modification
+    let modeModification = false;
+    let ouvrierEnModification = null;
+
+    function ouvrirModalAjout() {
+        modeModification = false;
+        ouvrierEnModification = null;
+
+        // Réinitialiser le titre et les textes
+        document.getElementById("modalTitleText").textContent = "Ajouter un Ouvrier";
+        document.getElementById("btnEnregistrerText").textContent = "Enregistrer";
+
+        // Réinitialiser le formulaire
+        document.getElementById("form-ajout-ouvrier").reset();
+        document.getElementById("ouvrierIdHidden").value = "";
+
+        // Masquer les prévisualisations et infos
+        document.getElementById("previewCINContainer").style.display = "none";
+        document.getElementById("previewCNSSContainer").style.display = "none";
+        document.getElementById("cinActuelleInfo").textContent = "";
+        document.getElementById("cnssActuelleInfo").textContent = "";
+
+        // Masquer les messages d'erreur
+        document.getElementById("cinFeedback").classList.add('d-none');
+
+        // Charger les données
+        chargerChantiersDansSelect();
+        chargerTypesDansSelect();
+
+        $('#ajouterOuvrierModal').modal('show');
+    }
+
+    function modifierOuvrier(ouvrierId) {
+        modeModification = true;
+
+        // Récupérer les données de l'ouvrier
+        fetch(`${API_BASE_URL}/ouvriers/${ouvrierId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ouvrier non trouvé');
+                }
+                return response.json();
+            })
+            .then(ouvrier => {
+                ouvrierEnModification = ouvrier;
+
+                // Changer le titre et les textes
+                document.getElementById("modalTitleText").textContent = "Modifier l'Ouvrier";
+                document.getElementById("btnEnregistrerText").textContent = "Mettre à jour";
+
+                // Remplir le formulaire avec les données existantes
+                remplirFormulaireModification(ouvrier);
+
+                // Charger les listes
+                chargerChantiersDansSelect(() => {
+                    // Sélectionner le chantier actuel après chargement
+                    if (ouvrier.id_chantier) {
+                        document.getElementById("chantierSelect").value = ouvrier.id_chantier;
+                    }
+                });
+
+                chargerTypesDansSelect(() => {
+                    // Sélectionner le type actuel après chargement
+                    document.getElementById("typeSelect").value = ouvrier.type;
+                });
+
+                $('#ajouterOuvrierModal').modal('show');
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des données de l\'ouvrier:', error);
+                alert('Erreur lors de la récupération des données de l\'ouvrier');
+            });
+    }
+
+    // Fonction pour remplir le formulaire en mode modification
+    function remplirFormulaireModification(ouvrier) {
+        document.getElementById("ouvrierIdHidden").value = ouvrier.id;
+        document.getElementById("nomInput").value = ouvrier.nom || '';
+        document.getElementById("prenomInput").value = ouvrier.prenom || '';
+        document.getElementById("cinInput").value = ouvrier.cin || '';
+        document.getElementById("prixHeureInput").value = ouvrier.prixHeure || '';
+        document.getElementById("prixJourInput").value = ouvrier.prixJour || '';
+
+        // Formatage de la date
+        if (ouvrier.dateNaissance) {
+            const date = new Date(ouvrier.dateNaissance);
+            const dateFormatted = date.toISOString().split('T')[0];
+            document.getElementById("dateNaissanceInput").value = dateFormatted;
+        }
+
+        // Afficher les informations sur les photos actuelles
+        if (ouvrier.photoCIN) {
+            document.getElementById("cinActuelleInfo").textContent =
+                `Photo CIN actuelle: ${ouvrier.photoCINName || 'image.jpg'} (Laisser vide pour conserver)`;
+        } else {
+            document.getElementById("cinActuelleInfo").textContent = "Aucune photo CIN actuelle";
+        }
+
+        if (ouvrier.photoCNSS) {
+            document.getElementById("cnssActuelleInfo").textContent =
+                `Photo CNSS actuelle: ${ouvrier.photoCNSSName || 'image.jpg'} (Laisser vide pour conserver)`;
+        } else {
+            document.getElementById("cnssActuelleInfo").textContent = "Aucune photo CNSS actuelle";
+        }
+
+        // Masquer les prévisualisations
+        document.getElementById("previewCINContainer").style.display = "none";
+        document.getElementById("previewCNSSContainer").style.display = "none";
+        document.getElementById("cinFeedback").classList.add('d-none');
+    }
 
     function voirOuvriersParChantier(chantierId) {
         fetch(`${API_BASE_URL}/ouvriers/by-chantier/${chantierId}`)
@@ -901,7 +1016,7 @@
         });
     }
 
-    // Vérification du CIN en temps réel
+    // Fonction pour la vérification du CIN (modifiée pour le mode modification)
     document.addEventListener('DOMContentLoaded', function() {
         const cinInput = document.getElementById('cinInput');
         const cinFeedback = document.getElementById('cinFeedback');
@@ -918,6 +1033,12 @@
 
     function checkCinExists(cin) {
         const cinFeedback = document.getElementById('cinFeedback');
+
+        // En mode modification, ne pas vérifier si c'est le même CIN
+        if (modeModification && ouvrierEnModification && ouvrierEnModification.cin === cin) {
+            cinFeedback.classList.add('d-none');
+            return;
+        }
 
         fetch(`${API_BASE_URL}/ouvriers/check-cin/${encodeURIComponent(cin)}`)
             .then(response => response.json())
@@ -938,24 +1059,131 @@
 
     // Event listener pour l'ouverture du modal d'ajout
     document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("form-ajout-ouvrier").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const chantierId = document.getElementById("chantierSelect").value;
+            const ouvrierId = document.getElementById("ouvrierIdHidden").value;
+
+            if (!chantierId) {
+                alert("Veuillez sélectionner un chantier !");
+                return;
+            }
+
+            // Validation des prix
+            const prixHeureInput = document.querySelector('input[name="prix_heure"]');
+            const prixJourInput = document.querySelector('input[name="prix_jour"]');
+
+            const prixHeure = parseFloat(prixHeureInput.value);
+            const prixJour = parseFloat(prixJourInput.value);
+
+            if (isNaN(prixHeure) || prixHeure <= 0) {
+                alert("Le prix par heure doit être un nombre positif");
+                prixHeureInput.focus();
+                return;
+            }
+
+            if (isNaN(prixJour) || prixJour <= 0) {
+                alert("Le prix par jour doit être un nombre positif");
+                prixJourInput.focus();
+                return;
+            }
+
+            // Formater les prix
+            formData.set("prix_heure", prixHeure.toString());
+            formData.set("prix_jour", prixJour.toString());
+
+            // Correction de la date si nécessaire
+            let dateNaissance = formData.get("date_naissance");
+            if (dateNaissance && dateNaissance.includes('/')) {
+                let parts = dateNaissance.split('/');
+                if (parts.length === 3) {
+                    let formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+                    formData.set("date_naissance", formattedDate);
+                }
+            }
+
+            // Supprimer le champ ID du FormData pour éviter les conflits
+            formData.delete("id");
+
+            // Déterminer l'URL et la méthode selon le mode
+            let url, method;
+            if (modeModification && ouvrierId) {
+                url = `${API_BASE_URL}/ouvriers/${ouvrierId}`;
+                method = "PUT";
+                console.log("Mode modification - ID:", ouvrierId);
+            } else {
+                url = `${API_BASE_URL}/ouvriers`;
+                method = "POST";
+                console.log("Mode création");
+            }
+
+            // Log des données
+            console.log("Données envoyées au serveur :");
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(key + ":", value.name, value.size, "bytes");
+                } else {
+                    console.log(key + ":", value);
+                }
+            }
+
+            // Envoi au backend
+            fetch(url, {
+                method: method,
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || `Erreur HTTP ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Réponse du serveur:", data);
+                    const message = modeModification ?
+                        "Ouvrier modifié avec succès !" :
+                        "Ouvrier ajouté avec succès !";
+                    alert(message);
+
+                    $('#ajouterOuvrierModal').modal('hide');
+                    this.reset();
+
+                    // Masquer les prévisualisations
+                    document.getElementById("previewCINContainer").style.display = "none";
+                    document.getElementById("previewCNSSContainer").style.display = "none";
+
+                    // Rafraîchir les stats du chantier
+                    rafraichirStatsChantier(chantierId);
+
+                    // Si le modal des ouvriers est ouvert, le rafraîchir aussi
+                    if ($('#ouvriersModal').hasClass('show')) {
+                        voirOuvriersParChantier(chantierId);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur:", error);
+
+                    if (error.message.includes("CIN est déjà utilisé")) {
+                        alert("Un ouvrier avec ce CIN existe déjà!");
+                    } else {
+                        alert("Erreur: " + error.message);
+                    }
+                });
+        });
+
+        // Event listener pour l'ouverture du modal d'ajout (bouton principal)
         const btnAjouter = document.getElementById("btn-ajouter");
         if (btnAjouter) {
-            btnAjouter.addEventListener("click", () => {
-                chargerChantiersDansSelect();
-                chargerTypesDansSelect();
-                // Réinitialiser le formulaire
-                document.getElementById("form-ajout-ouvrier").reset();
-                // Masquer les prévisualisations
-                document.getElementById("previewCINContainer").style.display = "none";
-                document.getElementById("previewCNSSContainer").style.display = "none";
-                // Masquer les messages d'erreur
-                document.getElementById("cinFeedback").classList.add('d-none');
-                $('#ajouterOuvrierModal').modal('show');
-            });
+            btnAjouter.addEventListener("click", ouvrirModalAjout);
         }
     });
 
-    function chargerChantiersDansSelect() {
+    // Fonction modifiée pour charger les chantiers avec callback
+    function chargerChantiersDansSelect(callback) {
         fetch(`${API_BASE_URL}/chantiers`)
             .then(response => response.json())
             .then(chantiers => {
@@ -967,11 +1195,12 @@
                     option.textContent = chantier.nomProjet;
                     select.appendChild(option);
                 });
+                if (callback) callback();
             })
             .catch(error => console.error('Erreur lors de la récupération des chantiers:', error));
     }
 
-    function chargerTypesDansSelect() {
+    function chargerTypesDansSelect(callback) {
         fetch(`${API_BASE_URL}/ouvriers/types`)
             .then(response => response.json())
             .then(types => {
@@ -983,6 +1212,7 @@
                     option.textContent = capitalizeFirstLetter(type);
                     select.appendChild(option);
                 });
+                if (callback) callback();
             })
             .catch(error => console.error('Erreur lors de la récupération des types:', error));
     }
@@ -1358,24 +1588,20 @@
         });
     }
 
-    // 4. Modifier aussi les autres actions qui peuvent affecter les stats
+    // Fonction modifiée pour la suppression avec rafraîchissement des stats
     function supprimerOuvrier(ouvrierId) {
         if (confirm('Êtes-vous sûr de vouloir supprimer cet ouvrier ?')) {
-            // D'abord récupérer les infos de l'ouvrier pour connaître son chantier
             fetch(`${API_BASE_URL}/ouvriers/${ouvrierId}`)
                 .then(response => response.json())
                 .then(ouvrier => {
                     const chantierId = ouvrier.id_chantier;
 
-                    // Supprimer l'ouvrier
                     return fetch(`${API_BASE_URL}/ouvriers/${ouvrierId}`, {
                         method: 'DELETE'
                     }).then(response => {
                         if (response.ok) {
                             alert('Ouvrier supprimé avec succès');
-                            // Rafraîchir les stats du chantier
                             rafraichirStatsChantier(chantierId);
-                            // Rafraîchir la liste des ouvriers si elle est ouverte
                             if ($('#ouvriersModal').hasClass('show')) {
                                 voirOuvriersParChantier(chantierId);
                             }
