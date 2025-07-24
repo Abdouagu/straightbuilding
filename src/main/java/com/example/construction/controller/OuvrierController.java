@@ -118,11 +118,18 @@ public class OuvrierController {
     ) {
         try {
             System.out.println("------ Modification ouvrier ID: " + id + " ------");
+            System.out.println("CIN reçu: " + cin);
             System.out.println("prix_heure (brut): " + prixHeureStr);
             System.out.println("prix_jour (brut): " + prixJourStr);
 
-            // Vérifier si l'ouvrier existe
-            OuvrierDTO existingOuvrier = ouvrierService.findOuvrierById(id);
+            // Récupérer l'ouvrier existant
+            OuvrierDTO existingOuvrier;
+            try {
+                existingOuvrier = ouvrierService.findOuvrierById(id);
+            } catch (RuntimeException e) {
+                System.err.println("Ouvrier non trouvé avec l'ID: " + id);
+                return ResponseEntity.notFound().build();
+            }
 
             // Convertir les prix
             float prixHeure;
@@ -135,10 +142,16 @@ public class OuvrierController {
                 return ResponseEntity.badRequest().body("Les prix doivent être des nombres valides");
             }
 
-            // Vérifier si le CIN existe déjà (sauf pour l'ouvrier actuel)
-            if (!existingOuvrier.getCin().equals(cin) && ouvrierService.existsByCin(cin)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Erreur : Ce CIN est déjà utilisé par un autre ouvrier.");
+            // Vérifier si le CIN existe déjà (seulement si le CIN a changé)
+            if (!existingOuvrier.getCin().equals(cin)) {
+                System.out.println("CIN a changé de '" + existingOuvrier.getCin() + "' vers '" + cin + "'");
+                if (ouvrierService.existsByCin(cin)) {
+                    System.err.println("Conflit: Ce CIN est déjà utilisé par un autre ouvrier");
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body("Erreur : Ce CIN est déjà utilisé par un autre ouvrier.");
+                }
+            } else {
+                System.out.println("CIN inchangé: " + cin);
             }
 
             // Créer le DTO avec les nouvelles données
@@ -168,17 +181,19 @@ public class OuvrierController {
 
             // Appeler le service pour la mise à jour avec fichiers
             OuvrierDTO updated = ouvrierService.updateOuvrierWithFiles(id, dto, photoCINFile, photoCNSSFile);
+            System.out.println("Ouvrier modifié avec succès - ID: " + updated.getId());
 
             return ResponseEntity.ok(updated);
 
         } catch (RuntimeException e) {
+            System.err.println("Erreur RuntimeException: " + e.getMessage());
             if (e.getMessage().contains("non trouvé")) {
                 return ResponseEntity.notFound().build();
             }
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur serveur : " + e.getMessage());
+                    .body("Erreur lors de la modification : " + e.getMessage());
         } catch (Exception e) {
+            System.err.println("Erreur générale: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erreur serveur : " + e.getClass().getSimpleName() + " - " + e.getMessage());

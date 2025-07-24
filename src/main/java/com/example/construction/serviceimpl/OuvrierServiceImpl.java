@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,12 +114,16 @@ public class OuvrierServiceImpl implements OuvrierService {
             }
 
             ouvrier savedEntity = ouvrierepo.save(entity);
+            System.out.println("Ouvrier sauvegardé avec succès - ID: " + savedEntity.getId());
             return convertToDTO(savedEntity);
 
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la lecture des fichiers: " + e.getMessage());
+            throw new RuntimeException("Erreur lors de la lecture des fichiers uploadés", e);
         } catch (Exception e) {
-            System.err.println("Erreur lors de la sauvegarde avec fichiers: " + e.getMessage());
+            System.err.println("Erreur lors de la sauvegarde: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Erreur lors de la sauvegarde de l'ouvrier avec les fichiers", e);
+            throw new RuntimeException("Erreur lors de la sauvegarde de l'ouvrier", e);
         }
     }
 

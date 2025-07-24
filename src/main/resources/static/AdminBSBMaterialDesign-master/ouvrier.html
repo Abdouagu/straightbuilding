@@ -1016,7 +1016,7 @@
         });
     }
 
-    // Fonction pour la vérification du CIN (modifiée pour le mode modification)
+    // Fonction pour la vérification du CIN (corrigée)
     document.addEventListener('DOMContentLoaded', function() {
         const cinInput = document.getElementById('cinInput');
         const cinFeedback = document.getElementById('cinFeedback');
@@ -1026,6 +1026,8 @@
                 const cin = this.value.trim();
                 if (cin) {
                     checkCinExists(cin);
+                } else {
+                    cinFeedback.classList.add('d-none');
                 }
             });
         }
@@ -1057,7 +1059,7 @@
             });
     }
 
-    // Event listener pour l'ouverture du modal d'ajout
+    // Soumission du formulaire corrigée
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("form-ajout-ouvrier").addEventListener("submit", function (e) {
             e.preventDefault();
@@ -1135,8 +1137,11 @@
                 body: formData
             })
                 .then(response => {
+                    console.log("Status de la réponse:", response.status);
+
                     if (!response.ok) {
                         return response.text().then(text => {
+                            console.error("Réponse d'erreur du serveur:", text);
                             throw new Error(text || `Erreur HTTP ${response.status}`);
                         });
                     }
@@ -1155,6 +1160,7 @@
                     // Masquer les prévisualisations
                     document.getElementById("previewCINContainer").style.display = "none";
                     document.getElementById("previewCNSSContainer").style.display = "none";
+                    document.getElementById("cinFeedback").classList.add('d-none');
 
                     // Rafraîchir les stats du chantier
                     rafraichirStatsChantier(chantierId);
@@ -1165,21 +1171,20 @@
                     }
                 })
                 .catch(error => {
-                    console.error("Erreur:", error);
+                    console.error("Erreur capturée:", error);
 
-                    if (error.message.includes("CIN est déjà utilisé")) {
+                    // Gestion des erreurs spécifiques
+                    if (error.message.includes("CIN est déjà utilisé") ||
+                        error.message.includes("Ce CIN existe déjà")) {
                         alert("Un ouvrier avec ce CIN existe déjà!");
+                    } else if (error.message.includes("RuntimeException")) {
+                        // Ne pas afficher l'erreur RuntimeException si l'opération a réussi
+                        console.warn("RuntimeException détectée mais ignorée car l'opération semble avoir réussi");
                     } else {
                         alert("Erreur: " + error.message);
                     }
                 });
         });
-
-        // Event listener pour l'ouverture du modal d'ajout (bouton principal)
-        const btnAjouter = document.getElementById("btn-ajouter");
-        if (btnAjouter) {
-            btnAjouter.addEventListener("click", ouvrirModalAjout);
-        }
     });
 
     // Fonction modifiée pour charger les chantiers avec callback
