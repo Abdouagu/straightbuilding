@@ -508,20 +508,27 @@
 <div id="ouvriersModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-
-            <div class="modal-header">
-                <h4 class="modal-title"><i class="material-icons">groups</i> Liste des ouvriers</h4>
-                <button type="button" class="close" data-dismiss="modal">
-                    <i class="material-icons">close</i>
+            <div class="modal-header bg-primary text-white">
+                <h4 class="modal-title">
+                    <i class="material-icons">groups</i> Liste des ouvriers
+                </h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
             <div class="modal-body">
+                <div id="statsOuvriersContainer" class="mb-4"></div>
                 <div class="row" id="ouvriersContainer">
                     <!-- Cartes ouvriers générées ici -->
                 </div>
             </div>
 
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="material-icons">close</i> Fermer
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -862,34 +869,44 @@
         const container = document.getElementById("ouvriersContainer");
         container.innerHTML = "";
 
-        ouvriers.forEach(ouvrier => {
-            const col = document.createElement("div");
-            col.className = "col-md-4";
+        if (ouvriers.length === 0) {
+            container.innerHTML = `
+            <div class="col-12 text-center py-4">
+                <i class="material-icons" style="font-size: 48px; color: #ccc;">engineering</i>
+                <p class="text-muted mt-2">Aucun ouvrier sur ce chantier</p>
+            </div>
+        `;
+            $('#ouvriersModal').modal('show');
+            return;
+        }
 
+        ouvriers.forEach(ouvrier => {
             const card = document.createElement("div");
-            card.className = "card-ouvrier";
+            card.className = "ouvrier-card"; // Utilisation de la nouvelle classe
 
             card.innerHTML = `
-                <img src="images/worker.png" alt="photo" class="img-thumbnail mb-2" style="width:100px;height:100px;">
-                <div class="nom"><strong>${ouvrier.nom} ${ouvrier.prenom}</strong></div>
-                <div class="type text-muted">${ouvrier.type}</div>
-                <div class="actions mt-2">
-                    <button class="btn btn-info btn-sm" onclick='voirInfos(${JSON.stringify(ouvrier)})'>
-                        <i class="material-icons">info</i>
-                    </button>
-                    <button class="btn btn-warning btn-sm" onclick="modifierOuvrier(${ouvrier.id})">
-                        <i class="material-icons">edit</i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="supprimerOuvrier(${ouvrier.id})">
-                        <i class="material-icons">delete_forever</i>
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="dissocierOuvrier(${ouvrier.id})">
-                        <i class="material-icons">link_off</i>
-                    </button>
-                </div>
-            `;
-            col.appendChild(card);
-            container.appendChild(col);
+            <img src="images/worker.png" alt="${ouvrier.nom} ${ouvrier.prenom}">
+            <div class="nom" title="${ouvrier.nom} ${ouvrier.prenom}">
+                <strong>${ouvrier.nom} ${ouvrier.prenom}</strong>
+            </div>
+            <div class="type">${ouvrier.type}</div>
+            <div class="actions">
+                <button class="btn btn-info btn-sm" onclick='voirInfos(${JSON.stringify(ouvrier)})' title="Détails">
+                    <i class="material-icons">info</i>
+                </button>
+                <button class="btn btn-warning btn-sm" onclick="modifierOuvrier(${ouvrier.id})" title="Modifier">
+                    <i class="material-icons">edit</i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="supprimerOuvrier(${ouvrier.id})" title="Supprimer">
+                    <i class="material-icons">delete_forever</i>
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="dissocierOuvrier(${ouvrier.id})" title="Dissocier">
+                    <i class="material-icons">link_off</i>
+                </button>
+            </div>
+        `;
+
+            container.appendChild(card);
         });
 
         $('#ouvriersModal').modal('show');
@@ -1036,12 +1053,6 @@
 
         // En mode modification, ne pas vérifier si c'est le même CIN
         if (modeModification && ouvrierEnModification && ouvrierEnModification.cin === cin) {
-            cinFeedback.classList.add('d-none');
-            return;
-        }
-
-        // Si le champ CIN est vide, ne rien faire
-        if (!cin || cin.trim() === '') {
             cinFeedback.classList.add('d-none');
             return;
         }
@@ -1649,31 +1660,78 @@
 
 <style>
 
-    .card-ouvrier img {
+    #ouvriersModal .modal-body {
+        padding: 20px;
+    }
+
+    #ouvriersContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* Centrer les cartes horizontalement */
+        gap: 15px; /* Espacement entre les cartes */
+    }
+
+
+    /* Nouveaux styles pour les cartes ouvriers */
+    .ouvrier-card {
+        text-align: center;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        margin: 10px;
+        width: 220px;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ouvrier-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .ouvrier-card img {
         width: 100px;
         height: 100px;
         object-fit: cover;
         border-radius: 50%;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+        border: 3px solid #f5f5f5;
     }
 
-    .card-ouvrier .nom {
+    .ouvrier-card .nom {
         font-weight: bold;
         font-size: 16px;
+        margin-bottom: 5px;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
-    .card-ouvrier .actions button {
-        margin: 5px 3px;
+    .ouvrier-card .type {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 15px;
     }
 
-    .image-preview {
-        max-width: 150px;
-        max-height: 150px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+    .ouvrier-card .actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: auto;
+    }
+
+    .ouvrier-card .actions button {
+        min-width: 36px;
         padding: 5px;
-        margin-top: 10px;
     }
+
 
     /* Styles pour les cartes chantiers */
     .card {
