@@ -508,27 +508,20 @@
 <div id="ouvriersModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h4 class="modal-title">
-                    <i class="material-icons">groups</i> Liste des ouvriers
-                </h4>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="material-icons">groups</i> Liste des ouvriers</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="material-icons">close</i>
                 </button>
             </div>
 
             <div class="modal-body">
-                <div id="statsOuvriersContainer" class="mb-4"></div>
                 <div class="row" id="ouvriersContainer">
                     <!-- Cartes ouvriers générées ici -->
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="material-icons">close</i> Fermer
-                </button>
-            </div>
         </div>
     </div>
 </div>
@@ -869,44 +862,34 @@
         const container = document.getElementById("ouvriersContainer");
         container.innerHTML = "";
 
-        if (ouvriers.length === 0) {
-            container.innerHTML = `
-            <div class="col-12 text-center py-4">
-                <i class="material-icons" style="font-size: 48px; color: #ccc;">engineering</i>
-                <p class="text-muted mt-2">Aucun ouvrier sur ce chantier</p>
-            </div>
-        `;
-            $('#ouvriersModal').modal('show');
-            return;
-        }
-
         ouvriers.forEach(ouvrier => {
+            const col = document.createElement("div");
+            col.className = "col-md-4";
+
             const card = document.createElement("div");
-            card.className = "ouvrier-card"; // Utilisation de la nouvelle classe
+            card.className = "card-ouvrier";
 
             card.innerHTML = `
-            <img src="images/worker.png" alt="${ouvrier.nom} ${ouvrier.prenom}">
-            <div class="nom" title="${ouvrier.nom} ${ouvrier.prenom}">
-                <strong>${ouvrier.nom} ${ouvrier.prenom}</strong>
-            </div>
-            <div class="type">${ouvrier.type}</div>
-            <div class="actions">
-                <button class="btn btn-info btn-sm" onclick='voirInfos(${JSON.stringify(ouvrier)})' title="Détails">
-                    <i class="material-icons">info</i>
-                </button>
-                <button class="btn btn-warning btn-sm" onclick="modifierOuvrier(${ouvrier.id})" title="Modifier">
-                    <i class="material-icons">edit</i>
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="supprimerOuvrier(${ouvrier.id})" title="Supprimer">
-                    <i class="material-icons">delete_forever</i>
-                </button>
-                <button class="btn btn-secondary btn-sm" onclick="dissocierOuvrier(${ouvrier.id})" title="Dissocier">
-                    <i class="material-icons">link_off</i>
-                </button>
-            </div>
-        `;
-
-            container.appendChild(card);
+                <img src="images/worker.png" alt="photo" class="img-thumbnail mb-2" style="width:100px;height:100px;">
+                <div class="nom"><strong>${ouvrier.nom} ${ouvrier.prenom}</strong></div>
+                <div class="type text-muted">${ouvrier.type}</div>
+                <div class="actions mt-2">
+                    <button class="btn btn-info btn-sm" onclick='voirInfos(${JSON.stringify(ouvrier)})'>
+                        <i class="material-icons">info</i>
+                    </button>
+                    <button class="btn btn-warning btn-sm" onclick="modifierOuvrier(${ouvrier.id})">
+                        <i class="material-icons">edit</i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="supprimerOuvrier(${ouvrier.id})">
+                        <i class="material-icons">delete_forever</i>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="dissocierOuvrier(${ouvrier.id})">
+                        <i class="material-icons">link_off</i>
+                    </button>
+                </div>
+            `;
+            col.appendChild(card);
+            container.appendChild(col);
         });
 
         $('#ouvriersModal').modal('show');
@@ -1304,8 +1287,8 @@
         container.innerHTML = "";
 
         chantiers.forEach(c => {
-            const col = document.createElement("div");
-            col.className = "col-lg-4 col-md-6 col-sm-12 mb-4";
+            const chantierCard = document.createElement("div");
+            chantierCard.className = "col-lg-4 col-md-4 col-sm-6 col-xs-12";
 
             let cardColorClass = c.etat === "TERMINE" ? "bg-green"
                 : c.etat === "EN_COURS" ? "bg-yellow"
@@ -1314,42 +1297,37 @@
 
             const statsContainerId = `stats-chantier-${c.id}`;
 
-            col.innerHTML = `
-        <div class="card h-100">
-            <div class="header ${cardColorClass}">
-                <h2>
-                    <i class="material-icons">construction</i>
-                    ${c.nomProjet}
-                    <small class="d-block">Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
-                </h2>
-                <ul class="header-dropdown m-r--5">
-                    <li>
-                        <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
-                            <i class="material-icons">groups</i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="body d-flex flex-column">
-                <div id="${statsContainerId}" class="flex-grow-1">
-                    <div class="text-center py-3">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Chargement...</span>
-                        </div>
-                        <p class="text-muted mt-2">Chargement des statistiques...</p>
+            chantierCard.innerHTML = `
+            <div class="card">
+                <div class="header ${cardColorClass}">
+                    <h2>
+                        <i class="material-icons">construction</i>
+                        ${c.nomProjet}
+                        <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
+                    </h2>
+                    <ul class="header-dropdown m-r--5">
+                        <li>
+                            <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
+                                <i class="material-icons">groups</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="body">
+                    <div id="${statsContainerId}">
+                        <p>Chargement des statistiques...</p>
+                    </div>
+                    <div class="text-right mt-2">
+                        <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
+                            <i class="material-icons">visibility</i> Voir les ouvriers
+                        </button>
                     </div>
                 </div>
-                <div class="text-right mt-2">
-                    <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
-                        <i class="material-icons">visibility</i> Voir les ouvriers
-                    </button>
-                </div>
             </div>
-        </div>
         `;
-            container.appendChild(col);
+            container.appendChild(chantierCard);
 
-            // Charger les stats
+            // CORRECTION ICI : URL complète pour les statistiques
             fetch(`${API_BASE_URL}/ouvriers/stats/by-chantier/${c.id}`)
                 .then(response => {
                     if (!response.ok) {
@@ -1358,50 +1336,44 @@
                     return response.json();
                 })
                 .then(stats => {
-                    const statsElement = document.getElementById(statsContainerId);
-                    if (!statsElement) return;
-
-                    if (Object.keys(stats).length === 0) {
-                        statsElement.innerHTML = `
-                        <div class="text-center py-3">
-                            <i class="material-icons" style="font-size: 48px; color: #ccc;">engineering</i>
-                            <p class="text-muted">Aucun ouvrier sur ce chantier</p>
-                        </div>
-                    `;
-                        return;
-                    }
-
                     const tableCells = Object.entries(stats).map(([type, count]) => {
                         const label = getLabelByType(type);
                         const color = getColorByType(type);
                         return `
                     <td style="text-align: center;">
-                        <div class="stat-circle" style="background-color: ${color}">${label}</div>
-                        <div class="stat-count">${count}</div>
+                        <div style="
+                            width: 52px;
+                            height: 52px;
+                            background-color: ${color};
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto;
+                            font-size: 20px;
+                            color: white;
+                            font-weight: bold;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        ">${label}</div>
+                        <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
                     </td>`;
                     }).join("");
 
-                    statsElement.innerHTML = `
-                <div class="table-responsive">
-                    <table class="table table-bordered m-0">
+                    document.getElementById(statsContainerId).innerHTML = `
+                    <table class="table table-bordered" style="width: 100%;">
                         <tr>${tableCells}</tr>
                     </table>
-                </div>
                 `;
                 })
                 .catch(error => {
                     console.error(`Erreur pour chantier ${c.id}:`, error);
-                    const statsElement = document.getElementById(statsContainerId);
-                    if (statsElement) {
-                        statsElement.innerHTML = `
+                    document.getElementById(statsContainerId).innerHTML = `
                     <p class="text-danger">Erreur lors du chargement des stats: ${error.message}</p>
-                    `;
-                    }
+                `;
                 });
         });
     }
 
-    // Fonctions utilitaires nécessaires
     function getLabelByType(type) {
         switch (type.toLowerCase()) {
             case "macon":
@@ -1659,134 +1631,39 @@
 </script>
 
 <style>
-
-    #ouvriersModal .modal-body {
-        padding: 20px;
-    }
-
-    #ouvriersContainer {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center; /* Centrer les cartes horizontalement */
-        gap: 15px; /* Espacement entre les cartes */
-    }
-
-
-    /* Nouveaux styles pour les cartes ouvriers */
-    .ouvrier-card {
+    .card-ouvrier {
         text-align: center;
-        padding: 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 12px;
         margin: 10px;
-        width: 220px;
-        transition: all 0.3s ease;
-        background: white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .ouvrier-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .ouvrier-card img {
+    .card-ouvrier img {
         width: 100px;
         height: 100px;
         object-fit: cover;
         border-radius: 50%;
-        margin-bottom: 15px;
-        border: 3px solid #f5f5f5;
+        margin-bottom: 10px;
     }
 
-    .ouvrier-card .nom {
+    .card-ouvrier .nom {
         font-weight: bold;
         font-size: 16px;
-        margin-bottom: 5px;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
     }
 
-    .ouvrier-card .type {
-        color: #666;
-        font-size: 14px;
-        margin-bottom: 15px;
+    .card-ouvrier .actions button {
+        margin: 5px 3px;
     }
 
-    .ouvrier-card .actions {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-top: auto;
-    }
-
-    .ouvrier-card .actions button {
-        min-width: 36px;
+    .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
         padding: 5px;
-    }
-
-
-    /* Styles pour les cartes chantiers */
-    .card {
-        transition: all 0.3s ease;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .card .header h2 {
-        font-size: 16px;
-        margin: 0;
-        padding: 10px;
-    }
-
-    .card .header h2 small {
-        font-size: 12px;
-        opacity: 0.8;
-    }
-
-    .stat-circle {
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        font-size: 20px;
-        color: white;
-        font-weight: bold;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        transition: all 0.3s ease;
-    }
-
-    .stat-count {
-        margin-top: 8px;
-        font-weight: bold;
-        font-size: 18px;
-    }
-
-    /* Uniformisation des hauteurs */
-    .row {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .row > [class*='col-'] {
-        display: flex;
-        flex-direction: column;
+        margin-top: 10px;
     }
 </style>
 

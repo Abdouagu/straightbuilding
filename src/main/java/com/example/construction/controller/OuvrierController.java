@@ -118,12 +118,11 @@ public class OuvrierController {
     ) {
         try {
             System.out.println("------ Modification ouvrier ID: " + id + " ------");
+            System.out.println("prix_heure (brut): " + prixHeureStr);
+            System.out.println("prix_jour (brut): " + prixJourStr);
 
-            // Récupérer l'ouvrier existant
+            // Vérifier si l'ouvrier existe
             OuvrierDTO existingOuvrier = ouvrierService.findOuvrierById(id);
-
-            // Vérifier si le CIN a changé
-            boolean cinChanged = !existingOuvrier.getCin().equals(cin);
 
             // Convertir les prix
             float prixHeure;
@@ -136,8 +135,8 @@ public class OuvrierController {
                 return ResponseEntity.badRequest().body("Les prix doivent être des nombres valides");
             }
 
-            // Vérifier si le nouveau CIN existe déjà (uniquement si le CIN a changé)
-            if (cinChanged && ouvrierService.existsByCin(cin)) {
+            // Vérifier si le CIN existe déjà (sauf pour l'ouvrier actuel)
+            if (!existingOuvrier.getCin().equals(cin) && ouvrierService.existsByCin(cin)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body("Erreur : Ce CIN est déjà utilisé par un autre ouvrier.");
             }
@@ -154,21 +153,17 @@ public class OuvrierController {
             dto.setPrixJour(prixJour);
             dto.setId_chantier(idChantier);
 
-            // Conserver les métadonnées des photos existantes si non modifiées
-            if (photoCINFile == null || photoCINFile.isEmpty()) {
-                dto.setPhotoCINName(existingOuvrier.getPhotoCINName());
-                dto.setPhotoCINType(existingOuvrier.getPhotoCINType());
-            } else {
+            // Traitement des photos
+            if (photoCINFile != null && !photoCINFile.isEmpty()) {
                 dto.setPhotoCINName(photoCINFile.getOriginalFilename());
                 dto.setPhotoCINType(photoCINFile.getContentType());
+                System.out.println("Nouvelle photo CIN reçue: " + photoCINFile.getOriginalFilename());
             }
 
-            if (photoCNSSFile == null || photoCNSSFile.isEmpty()) {
-                dto.setPhotoCNSSName(existingOuvrier.getPhotoCNSSName());
-                dto.setPhotoCNSSType(existingOuvrier.getPhotoCNSSType());
-            } else {
+            if (photoCNSSFile != null && !photoCNSSFile.isEmpty()) {
                 dto.setPhotoCNSSName(photoCNSSFile.getOriginalFilename());
                 dto.setPhotoCNSSType(photoCNSSFile.getContentType());
+                System.out.println("Nouvelle photo CNSS reçue: " + photoCNSSFile.getOriginalFilename());
             }
 
             // Appeler le service pour la mise à jour avec fichiers
