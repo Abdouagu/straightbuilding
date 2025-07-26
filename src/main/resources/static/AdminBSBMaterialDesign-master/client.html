@@ -783,6 +783,9 @@
         let clients = [];
         let editingClientId = null;
 
+        // Configuration de l'URL de base pour l'API
+        const API_BASE_URL = 'https://straightbuilding.onrender.com';
+
         // Charger les clients au démarrage
         loadClients();
 
@@ -797,15 +800,26 @@
             $('#empty-state').hide();
 
             $.ajax({
-                url: '/api/clients',
+                url: `${API_BASE_URL}/api/clients`,
                 method: 'GET',
+                timeout: 15000, // Timeout de 15 secondes
                 success: function(data) {
                     clients = data;
                     displayClients();
                 },
                 error: function(xhr, status, error) {
                     console.error('Erreur lors du chargement des clients:', error);
-                    showAlert('Erreur lors du chargement des clients', 'alert-danger');
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
+
+                    let errorMessage = 'Erreur lors du chargement des clients';
+                    if (status === 'timeout') {
+                        errorMessage = 'Délai d\'attente dépassé. Vérifiez votre connexion.';
+                    } else if (xhr.status === 0) {
+                        errorMessage = 'Impossible de se connecter au serveur.';
+                    }
+
+                    showAlert(errorMessage, 'alert-danger');
                     $('#empty-state').show();
                 },
                 complete: function() {
@@ -837,37 +851,37 @@
             const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(client.nom + ' ' + client.prenom)}&size=70&background=f44336&color=ffffff&font-size=0.6`;
 
             return `
-            <div class="client-card" data-client-id="${client.id}">
-                <div class="client-header">
-                    <img src="${avatarUrl}" alt="Avatar" class="client-avatar">
+        <div class="client-card" data-client-id="${client.id}">
+            <div class="client-header">
+                <img src="${avatarUrl}" alt="Avatar" class="client-avatar">
+            </div>
+            <div class="client-body">
+                <div class="client-name">${client.nom} ${client.prenom}</div>
+                <div class="client-info">
+                    <i class="material-icons">email</i>
+                    ${client.email}
                 </div>
-                <div class="client-body">
-                    <div class="client-name">${client.nom} ${client.prenom}</div>
-                    <div class="client-info">
-                        <i class="material-icons">email</i>
-                        ${client.email}
-                    </div>
-                    <div class="client-info">
-                        <i class="material-icons">phone</i>
-                        ${client.phone}
-                    </div>
-                </div>
-                <div class="client-actions">
-                    <button class="btn btn-info btn-sm waves-effect" onclick="viewClient(${client.id})">
-                        <i class="material-icons">visibility</i>
-                        CONSULTER
-                    </button>
-                    <button class="btn btn-warning btn-sm waves-effect" onclick="editClient(${client.id})">
-                        <i class="material-icons">edit</i>
-                        MODIFIER
-                    </button>
-                    <button class="btn btn-danger btn-sm waves-effect" onclick="deleteClient(${client.id})">
-                        <i class="material-icons">delete</i>
-                        SUPPRIMER
-                    </button>
+                <div class="client-info">
+                    <i class="material-icons">phone</i>
+                    ${client.phone}
                 </div>
             </div>
-        `;
+            <div class="client-actions">
+                <button class="btn btn-info btn-sm waves-effect" onclick="viewClient(${client.id})">
+                    <i class="material-icons">visibility</i>
+                    CONSULTER
+                </button>
+                <button class="btn btn-warning btn-sm waves-effect" onclick="editClient(${client.id})">
+                    <i class="material-icons">edit</i>
+                    MODIFIER
+                </button>
+                <button class="btn btn-danger btn-sm waves-effect" onclick="deleteClient(${client.id})">
+                    <i class="material-icons">delete</i>
+                    SUPPRIMER
+                </button>
+            </div>
+        </div>
+    `;
         }
 
         // Fonction pour sauvegarder un client
@@ -891,12 +905,19 @@
                 return;
             }
 
+            // Validation email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(clientData.email)) {
+                showAlert('Veuillez entrer un email valide', 'alert-danger');
+                return;
+            }
+
             $('#saveClient').prop('disabled', true);
             $('#saveText').hide();
             $('#saveSpinner').show();
 
             const isEditing = editingClientId !== null;
-            const url = isEditing ? `/api/clients/${editingClientId}` : '/api/clients';
+            const url = isEditing ? `${API_BASE_URL}/api/clients/${editingClientId}` : `${API_BASE_URL}/api/clients`;
             const method = isEditing ? 'PUT' : 'POST';
 
             if (isEditing) {
@@ -908,16 +929,32 @@
                 method: method,
                 contentType: 'application/json',
                 data: JSON.stringify(clientData),
+                timeout: 15000,
                 success: function(response) {
+                    console.log('Succès:', response);
                     showAlert(isEditing ? 'Client modifié avec succès' : 'Client ajouté avec succès', 'alert-success');
                     $('#clientModal').modal('hide');
                     loadClients();
                 },
-                error: function(xhr) {
+                error: function(xhr, status, error) {
+                    console.error('Erreur AJAX:', error);
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
+
                     let message = 'Une erreur est survenue';
-                    if (xhr.status === 409) {
+
+                    if (status === 'timeout') {
+                        message = 'Délai d\'attente dépassé. Veuillez réessayer.';
+                    } else if (xhr.status === 409) {
                         message = 'L\'email ou le téléphone existe déjà';
+                    } else if (xhr.status === 400) {
+                        message = 'Données invalides. Vérifiez les champs.';
+                    } else if (xhr.status === 500) {
+                        message = 'Erreur serveur. Veuillez réessayer plus tard.';
+                    } else if (xhr.status === 0) {
+                        message = 'Impossible de se connecter au serveur.';
                     }
+
                     showAlert(message, 'alert-danger');
                 },
                 complete: function() {
@@ -947,40 +984,40 @@
                 const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(client.nom + ' ' + client.prenom)}&size=120&background=f44336&color=ffffff&font-size=0.6`;
 
                 $('#detailsContent').html(`
-                <div class="text-center" style="margin-bottom: 30px;">
-                    <img src="${avatarUrl}" alt="Avatar" style="border-radius: 50%; margin-bottom: 15px; border: 4px solid #f44336;">
-                    <h3 style="color: #333; margin-bottom: 5px;">${client.nom} ${client.prenom}</h3>
-                    <small style="color: #666;">ID: ${client.id}</small>
-                </div>
+            <div class="text-center" style="margin-bottom: 30px;">
+                <img src="${avatarUrl}" alt="Avatar" style="border-radius: 50%; margin-bottom: 15px; border: 4px solid #f44336;">
+                <h3 style="color: #333; margin-bottom: 5px;">${client.nom} ${client.prenom}</h3>
+                <small style="color: #666;">ID: ${client.id}</small>
+            </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                <i class="material-icons" style="color: #f44336; margin-right: 10px;">email</i>
-                                <div>
-                                    <strong>Email:</strong><br>
-                                    <a href="mailto:${client.email}" style="color: #f44336;">${client.email}</a>
-                                </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <i class="material-icons" style="color: #f44336; margin-right: 10px;">email</i>
+                            <div>
+                                <strong>Email:</strong><br>
+                                <a href="mailto:${client.email}" style="color: #f44336;">${client.email}</a>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                            <div style="display: flex; align-items: center;">
-                                <i class="material-icons" style="color: #f44336; margin-right: 10px;">phone</i>
-                                <div>
-                                    <strong>Téléphone:</strong><br>
-                                    <a href="tel:${client.phone}" style="color: #f44336;">${client.phone}</a>
-                                </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <div style="display: flex; align-items: center;">
+                            <i class="material-icons" style="color: #f44336; margin-right: 10px;">phone</i>
+                            <div>
+                                <strong>Téléphone:</strong><br>
+                                <a href="tel:${client.phone}" style="color: #f44336;">${client.phone}</a>
                             </div>
                         </div>
                     </div>
                 </div>
-            `);
+            </div>
+        `);
                 $('#detailsModal').modal('show');
             }
         };
@@ -1006,14 +1043,20 @@
             const client = clients.find(c => c.id === clientId);
             if (client && confirm(`Êtes-vous sûr de vouloir supprimer le client ${client.nom} ${client.prenom} ?`)) {
                 $.ajax({
-                    url: `/api/clients/${clientId}`,
+                    url: `${API_BASE_URL}/api/clients/${clientId}`,
                     method: 'DELETE',
+                    timeout: 15000,
                     success: function() {
                         showAlert('Client supprimé avec succès', 'alert-success');
                         loadClients();
                     },
-                    error: function() {
-                        showAlert('Erreur lors de la suppression du client', 'alert-danger');
+                    error: function(xhr, status, error) {
+                        console.error('Erreur suppression:', error);
+                        let message = 'Erreur lors de la suppression du client';
+                        if (status === 'timeout') {
+                            message = 'Délai d\'attente dépassé lors de la suppression.';
+                        }
+                        showAlert(message, 'alert-danger');
                     }
                 });
             }
@@ -1043,6 +1086,25 @@
                 $(this).parent('.form-line').removeClass('focused');
             }
         });
+
+        // Test de connectivité au démarrage
+        function testConnection() {
+            $.ajax({
+                url: `${API_BASE_URL}/api/test`,
+                method: 'GET',
+                timeout: 5000,
+                success: function() {
+                    console.log('Connexion au serveur OK');
+                },
+                error: function() {
+                    console.warn('Problème de connexion au serveur détecté');
+                    showAlert('Problème de connexion au serveur. Certaines fonctionnalités peuvent être limitées.', 'alert-warning');
+                }
+            });
+        }
+
+        // Tester la connexion au démarrage (optionnel)
+        // testConnection();
     });
 </script>
 
