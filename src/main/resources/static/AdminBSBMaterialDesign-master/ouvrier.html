@@ -306,6 +306,12 @@
                         <span>Home</span>
                     </a>
                 </li>
+                <li >
+                    <a href="client.html">
+                        <i class="material-icons">engineering</i>
+                        <span>Ouvrier</span>
+                    </a>
+                </li>
                 <li>
                     <a href="chantier.html">
                         <i class="material-icons">location_city</i>
@@ -500,24 +506,31 @@
         <div class="row clearfix" id="chantiersContainer">
             <!-- Cartes chantiers dynamiques -->
         </div>
+
+
+
     </div>
 </section>
+
 
 <!-- MODAL - Liste des Ouvriers -->
 <div id="ouvriersModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
+
             <div class="modal-header">
                 <h4 class="modal-title"><i class="material-icons">groups</i> Liste des ouvriers</h4>
                 <button type="button" class="close" data-dismiss="modal">
                     <i class="material-icons">close</i>
                 </button>
             </div>
+
             <div class="modal-body">
                 <div class="row" id="ouvriersContainer">
                     <!-- Cartes ouvriers générées ici -->
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -563,6 +576,7 @@
 <div id="ajouterOuvrierModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
+
             <!-- HEADER -->
             <div class="modal-header">
                 <h4 class="modal-title" id="modalTitle">
@@ -576,10 +590,12 @@
             <!-- BODY -->
             <div class="modal-body">
                 <form id="form-ajout-ouvrier" class="row" enctype="multipart/form-data" method="post">
+                    <!-- Champ caché pour l'ID lors de la modification -->
                     <input type="hidden" id="ouvrierIdHidden" name="id" value="">
 
                     <!-- COL GAUCHE -->
                     <div class="col-md-6">
+                        <!-- Nom -->
                         <div class="form-group">
                             <label>Nom</label>
                             <div class="input-group">
@@ -590,6 +606,7 @@
                             </div>
                         </div>
 
+                        <!-- Prénom -->
                         <div class="form-group">
                             <label>Prénom</label>
                             <div class="input-group">
@@ -600,6 +617,7 @@
                             </div>
                         </div>
 
+                        <!-- CIN -->
                         <div class="form-group">
                             <label>CIN</label>
                             <div class="input-group">
@@ -611,6 +629,7 @@
                             <small id="cinFeedback" class="form-text text-danger d-none">Ce CIN existe déjà !</small>
                         </div>
 
+                        <!-- Date de naissance -->
                         <div class="form-group">
                             <label>Date de naissance</label>
                             <div class="input-group">
@@ -621,21 +640,24 @@
                             </div>
                         </div>
 
+                        <!-- Type -->
                         <div class="form-group">
                             <label>Type</label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">category</i></span>
                                 <div class="form-line">
-                                    <select id="typeSelect" name="type" class="form-control" required>
+                                    <select id="typeSelect" name="type" required>
                                         <!-- Options ajoutées dynamiquement -->
                                     </select>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- COL DROITE -->
                     <div class="col-md-6">
+                        <!-- Prix Heure -->
                         <div class="form-group">
                             <label>Prix Heure</label>
                             <div class="input-group">
@@ -646,6 +668,7 @@
                             </div>
                         </div>
 
+                        <!-- Prix Jour -->
                         <div class="form-group">
                             <label>Prix Jour</label>
                             <div class="input-group">
@@ -656,18 +679,21 @@
                             </div>
                         </div>
 
+                        <!-- Sélection du Chantier -->
                         <div class="form-group">
                             <label>Chantier</label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="material-icons">location_on</i></span>
                                 <div>
-                                    <select name="id_chantier" id="chantierSelect" class="form-control" required>
+                                    <select name="id_chantier" id="chantierSelect" required>
                                         <option value="">-- Choisir un chantier --</option>
+                                        <!-- Les options seront injectées dynamiquement ici -->
                                     </select>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Photo CIN -->
                         <div class="form-group">
                             <label for="photoCIN"><strong>Photo CIN</strong></label>
                             <input type="file" class="form-control-file" id="photoCIN" name="photo_CIN" accept="image/*"
@@ -682,6 +708,7 @@
                             <small class="form-text text-muted" id="cinActuelleInfo"></small>
                         </div>
 
+                        <!-- Photo CNSS -->
                         <div class="form-group">
                             <label for="photoCNSS"><strong>Photo CNSS</strong></label>
                             <input type="file" class="form-control-file" id="photoCNSS" name="photo_CNSS" accept="image/*"
@@ -706,217 +733,14 @@
                             <i class="material-icons">cancel</i> Annuler
                         </button>
                     </div>
+
                 </form>
             </div>
+
         </div>
     </div>
 </div>
 
-<style>
-    /* Styles pour les cartes chantiers */
-    .chantier-card {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .chantier-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    }
-
-    .chantier-header {
-        padding: 20px;
-        border-radius: 8px 8px 0 0;
-        color: white;
-        position: relative;
-        min-height: 100px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .chantier-header h2 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-        line-height: 1.3;
-    }
-
-    .chantier-header small {
-        display: block;
-        margin-top: 8px;
-        font-size: 12px;
-        opacity: 0.9;
-    }
-
-    .chantier-body {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        background: white;
-        border-radius: 0 0 8px 8px;
-    }
-
-    .stats-container {
-        flex-grow: 1;
-        margin-bottom: 15px;
-    }
-
-    .stats-table {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-    .stats-table td {
-        text-align: center;
-        padding: 10px 5px;
-        border: none;
-        vertical-align: middle;
-    }
-
-    .stat-circle {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        font-size: 16px;
-        color: white;
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        transition: transform 0.2s ease;
-    }
-
-    .stat-circle:hover {
-        transform: scale(1.1);
-    }
-
-    .stat-count {
-        margin-top: 8px;
-        font-weight: bold;
-        font-size: 16px;
-        color: #333;
-    }
-
-    .chantier-actions {
-        margin-top: auto;
-        text-align: right;
-    }
-
-    .header-actions {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-    }
-
-    .header-actions a {
-        color: white;
-        opacity: 0.8;
-        transition: opacity 0.2s ease;
-    }
-
-    .header-actions a:hover {
-        opacity: 1;
-    }
-
-    /* Classes de couleurs pour les états */
-    .bg-green { background: linear-gradient(135deg, #4CAF50, #45a049); }
-    .bg-yellow { background: linear-gradient(135deg, #FF9800, #f57c00); }
-    .bg-red { background: linear-gradient(135deg, #f44336, #d32f2f); }
-    .bg-gray { background: linear-gradient(135deg, #9E9E9E, #757575); }
-
-    /* Styles pour les cartes ouvriers */
-    .card-ouvrier {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        transition: transform 0.2s ease;
-    }
-
-    .card-ouvrier:hover {
-        transform: translateY(-2px);
-    }
-
-    .card-ouvrier img {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-bottom: 15px;
-        border: 3px solid #f0f0f0;
-    }
-
-    .card-ouvrier .nom {
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 5px;
-    }
-
-    .card-ouvrier .type {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 15px;
-    }
-
-    .card-ouvrier .actions button {
-        margin: 2px;
-        padding: 6px 12px;
-        border-radius: 4px;
-        border: none;
-        font-size: 12px;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .chantier-header h2 {
-            font-size: 16px;
-        }
-
-        .stat-circle {
-            width: 40px;
-            height: 40px;
-            font-size: 14px;
-        }
-
-        .stat-count {
-            font-size: 14px;
-        }
-    }
-
-    /* Loading state */
-    .loading-stats {
-        text-align: center;
-        padding: 20px;
-        color: #666;
-        font-style: italic;
-    }
-
-    /* Error state */
-    .error-stats {
-        text-align: center;
-        padding: 20px;
-        color: #f44336;
-        font-size: 14px;
-    }
-
-    /* Animation pour les mises à jour */
-    .stats-updating {
-        opacity: 0.6;
-        transition: opacity 0.3s ease;
-    }
-</style>
 
 <script>
     // Configuration de l'API
@@ -1055,8 +879,8 @@
             card.className = "card-ouvrier";
 
             card.innerHTML = `
-                <img src="images/worker.png" alt="photo" class="img-thumbnail mb-2">
-                <div class="nom">${ouvrier.nom} ${ouvrier.prenom}</div>
+                <img src="images/worker.png" alt="photo" class="img-thumbnail mb-2" style="width:100px;height:100px;">
+                <div class="nom"><strong>${ouvrier.nom} ${ouvrier.prenom}</strong></div>
                 <div class="type text-muted">${ouvrier.type}</div>
                 <div class="actions mt-2">
                     <button class="btn btn-info btn-sm" onclick='voirInfos(${JSON.stringify(ouvrier)})'>
@@ -1093,7 +917,7 @@
         document.getElementById("detailPrixHeure").innerText = ouvrier.prixHeure ? `${ouvrier.prixHeure} Dhs/h` : "-";
         document.getElementById("detailPrixJour").innerText = ouvrier.prixJour ? `${ouvrier.prixJour} Dhs/jour` : "-";
 
-        // Gestion de la photo CIN
+        // Gestion de la photo CIN - CORRECTION DES URLs
         const cinImg = document.getElementById("detailPhotoCIN");
         const cinError = document.getElementById("cinError");
 
@@ -1104,6 +928,7 @@
         cinImg.onerror = null;
 
         if (ouvrier.photoCIN) {
+            // L'URL est déjà construite côté backend : /api/ouvriers/images/cin/{id}
             const cinUrl = `${API_BASE_URL}${ouvrier.photoCIN}`;
             console.log("Chargement de la photo CIN :", cinUrl);
 
@@ -1128,7 +953,7 @@
             cinError.textContent = "Aucune photo CIN disponible";
         }
 
-        // Gestion de la photo CNSS
+        // Gestion de la photo CNSS - CORRECTION DES URLs
         const cnssImg = document.getElementById("detailPhotoCNSS");
         const cnssError = document.getElementById("cnssError");
 
@@ -1139,6 +964,7 @@
         cnssImg.onerror = null;
 
         if (ouvrier.photoCNSS) {
+            // L'URL est déjà construite côté backend : /api/ouvriers/images/cnss/{id}
             const cnssUrl = `${API_BASE_URL}${ouvrier.photoCNSS}`;
             console.log("Chargement de la photo CNSS :", cnssUrl);
 
@@ -1199,7 +1025,9 @@
         });
     }
 
-    // Fonction pour la vérification du CIN
+
+
+    // Fonction pour la vérification du CIN (corrigée)
     document.addEventListener('DOMContentLoaded', function() {
         const cinInput = document.getElementById('cinInput');
         const cinFeedback = document.getElementById('cinFeedback');
@@ -1242,7 +1070,7 @@
             });
     }
 
-    // Soumission du formulaire
+    // Soumission du formulaire corrigée
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("form-ajout-ouvrier").addEventListener("submit", function (e) {
             e.preventDefault();
@@ -1304,6 +1132,16 @@
                 console.log("Mode création");
             }
 
+            // Log des données
+            console.log("Données envoyées au serveur :");
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(key + ":", value.name, value.size, "bytes");
+                } else {
+                    console.log(key + ":", value);
+                }
+            }
+
             // Envoi au backend
             fetch(url, {
                 method: method,
@@ -1351,6 +1189,7 @@
                         error.message.includes("Ce CIN existe déjà")) {
                         alert("Un ouvrier avec ce CIN existe déjà!");
                     } else if (error.message.includes("RuntimeException")) {
+                        // Ne pas afficher l'erreur RuntimeException si l'opération a réussi
                         console.warn("RuntimeException détectée mais ignorée car l'opération semble avoir réussi");
                     } else {
                         alert("Erreur: " + error.message);
@@ -1358,12 +1197,12 @@
                 });
 
         });
-
         const btnAjouter = document.getElementById("btn-ajouter");
         if (btnAjouter) {
             btnAjouter.addEventListener("click", ouvrirModalAjout);
         }
     });
+
 
     // Fonction modifiée pour charger les chantiers avec callback
     function chargerChantiersDansSelect(callback) {
@@ -1471,7 +1310,7 @@
 
         chantiers.forEach(c => {
             const chantierCard = document.createElement("div");
-            chantierCard.className = "col-lg-4 col-md-6 col-sm-12 mb-4";
+            chantierCard.className = "col-lg-4 col-md-4 col-sm-6 col-xs-12";
 
             let cardColorClass = c.etat === "TERMINE" ? "bg-green"
                 : c.etat === "EN_COURS" ? "bg-yellow"
@@ -1481,34 +1320,36 @@
             const statsContainerId = `stats-chantier-${c.id}`;
 
             chantierCard.innerHTML = `
-                <div class="chantier-card">
-                    <div class="chantier-header ${cardColorClass}">
-                        <div class="header-actions">
+            <div class="card">
+                <div class="header ${cardColorClass}">
+                    <h2>
+                        <i class="material-icons">construction</i>
+                        ${c.nomProjet}
+                        <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
+                    </h2>
+                    <ul class="header-dropdown m-r--5">
+                        <li>
                             <a href="javascript:void(0);" onclick="voirOuvriersParChantier(${c.id})">
                                 <i class="material-icons">groups</i>
                             </a>
-                        </div>
-                        <h2>
-                            <i class="material-icons">construction</i>
-                            ${c.nomProjet}
-                            <small>Ouverture : ${new Date(c.dateOuverture).toLocaleDateString()} | État : <strong>${c.etat}</strong></small>
-                        </h2>
+                        </li>
+                    </ul>
+                </div>
+                <div class="body">
+                    <div id="${statsContainerId}">
+                        <p>Chargement des statistiques...</p>
                     </div>
-                    <div class="chantier-body">
-                        <div class="stats-container" id="${statsContainerId}">
-                            <div class="loading-stats">Chargement des statistiques...</div>
-                        </div>
-                        <div class="chantier-actions">
-                            <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
-                                <i class="material-icons">visibility</i> Voir les ouvriers
-                            </button>
-                        </div>
+                    <div class="text-right mt-2">
+                        <button class="btn btn-info btn-sm waves-effect" onclick="voirOuvriersParChantier(${c.id})">
+                            <i class="material-icons">visibility</i> Voir les ouvriers
+                        </button>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
             container.appendChild(chantierCard);
 
-            // Charger les statistiques
+            // CORRECTION ICI : URL complète pour les statistiques
             fetch(`${API_BASE_URL}/ouvriers/stats/by-chantier/${c.id}`)
                 .then(response => {
                     if (!response.ok) {
@@ -1517,42 +1358,40 @@
                     return response.json();
                 })
                 .then(stats => {
-                    const statsContainer = document.getElementById(statsContainerId);
-
-                    if (Object.keys(stats).length === 0) {
-                        statsContainer.innerHTML = `
-                            <div class="text-center text-muted">
-                                <i class="material-icons" style="font-size: 48px; opacity: 0.3;">person_outline</i>
-                                <p>Aucun ouvrier assigné</p>
-                            </div>
-                        `;
-                        return;
-                    }
-
                     const tableCells = Object.entries(stats).map(([type, count]) => {
                         const label = getLabelByType(type);
                         const color = getColorByType(type);
                         return `
-                            <td>
-                                <div class="stat-circle" style="background-color: ${color};">
-                                    ${label}
-                                </div>
-                                <div class="stat-count">${count}</div>
-                            </td>
-                        `;
+                    <td style="text-align: center;">
+                        <div style="
+                            width: 52px;
+                            height: 52px;
+                            background-color: ${color};
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto;
+                            font-size: 20px;
+                            color: white;
+                            font-weight: bold;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        ">${label}</div>
+                        <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
+                    </td>`;
                     }).join("");
 
-                    statsContainer.innerHTML = `
-                        <table class="stats-table">
-                            <tr>${tableCells}</tr>
-                        </table>
-                    `;
+                    document.getElementById(statsContainerId).innerHTML = `
+                    <table class="table table-bordered" style="width: 100%;">
+                        <tr>${tableCells}</tr>
+                    </table>
+                `;
                 })
                 .catch(error => {
                     console.error(`Erreur pour chantier ${c.id}:`, error);
                     document.getElementById(statsContainerId).innerHTML = `
-                        <div class="error-stats">Erreur lors du chargement des stats: ${error.message}</div>
-                    `;
+                    <p class="text-danger">Erreur lors du chargement des stats: ${error.message}</p>
+                `;
                 });
         });
     }
@@ -1595,7 +1434,7 @@
         }
     }
 
-    // Fonction pour rafraîchir les stats d'un chantier spécifique
+    // 1. Créer une fonction pour rafraîchir les stats d'un chantier spécifique
     function rafraichirStatsChantier(chantierId) {
         const statsContainerId = `stats-chantier-${chantierId}`;
         const statsContainer = document.getElementById(statsContainerId);
@@ -1605,9 +1444,8 @@
             return;
         }
 
-        // Afficher un indicateur de chargement avec animation
-        statsContainer.classList.add('stats-updating');
-        statsContainer.innerHTML = '<div class="loading-stats">Mise à jour des statistiques...</div>';
+        // Afficher un indicateur de chargement
+        statsContainer.innerHTML = '<p>Mise à jour des statistiques...</p>';
 
         // Récupérer les nouvelles statistiques
         fetch(`${API_BASE_URL}/ouvriers/stats/by-chantier/${chantierId}`)
@@ -1618,47 +1456,50 @@
                 return response.json();
             })
             .then(stats => {
-                if (Object.keys(stats).length === 0) {
-                    statsContainer.innerHTML = `
-                        <div class="text-center text-muted">
-                            <i class="material-icons" style="font-size: 48px; opacity: 0.3;">person_outline</i>
-                            <p>Aucun ouvrier assigné</p>
-                        </div>
-                    `;
-                } else {
-                    const tableCells = Object.entries(stats).map(([type, count]) => {
-                        const label = getLabelByType(type);
-                        const color = getColorByType(type);
-                        return `
-                            <td>
-                                <div class="stat-circle" style="background-color: ${color};">
-                                    ${label}
-                                </div>
-                                <div class="stat-count">${count}</div>
-                            </td>
-                        `;
-                    }).join("");
+                const tableCells = Object.entries(stats).map(([type, count]) => {
+                    const label = getLabelByType(type);
+                    const color = getColorByType(type);
+                    return `
+                <td style="text-align: center;">
+                    <div style="
+                        width: 52px;
+                        height: 52px;
+                        background-color: ${color};
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto;
+                        font-size: 20px;
+                        color: white;
+                        font-weight: bold;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        transition: all 0.3s ease;
+                    ">${label}</div>
+                    <div style="margin-top: 8px; font-weight: bold; font-size: 18px;">${count}</div>
+                </td>`;
+                }).join("");
 
-                    statsContainer.innerHTML = `
-                        <table class="stats-table">
-                            <tr>${tableCells}</tr>
-                        </table>
-                    `;
-                }
+                statsContainer.innerHTML = `
+                <table class="table table-bordered" style="width: 100%;">
+                    <tr>${tableCells}</tr>
+                </table>
+            `;
 
-                // Enlever l'animation de chargement
+                // Animation pour indiquer la mise à jour
+                statsContainer.style.opacity = '0.7';
                 setTimeout(() => {
-                    statsContainer.classList.remove('stats-updating');
+                    statsContainer.style.opacity = '1';
                 }, 200);
             })
             .catch(error => {
                 console.error(`Erreur lors de la mise à jour des stats pour le chantier ${chantierId}:`, error);
                 statsContainer.innerHTML = `
-                    <div class="error-stats">Erreur lors du chargement des stats: ${error.message}</div>
-                `;
-                statsContainer.classList.remove('stats-updating');
+                <p class="text-danger">Erreur lors du chargement des stats: ${error.message}</p>
+            `;
             });
     }
+
 
     // Fonction modifiée pour la suppression avec rafraîchissement des stats
     function supprimerOuvrier(ouvrierId) {
@@ -1688,12 +1529,38 @@
                 });
         }
     }
-    
+
 
     window.onload = function () {
         voirChantiers();
     };
 </script>
+
+<style>
+
+    .card-ouvrier img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+
+
+    .card-ouvrier .actions button {
+        margin: 5px 3px;
+    }
+
+    .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        margin-top: 10px;
+    }
+</style>
 
 
 
