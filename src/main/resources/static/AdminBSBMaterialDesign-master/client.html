@@ -779,330 +779,354 @@
 
 <!-- Script personnalisé pour la gestion des clients -->
 <script>
-    // Script de débogage - à remplacer dans votre fichier HTML
-    console.log('=== DÉBUT DU SCRIPT DE DÉBOGAGE ===');
-
-    $(document).ready(function() {
-        console.log('Document ready - jQuery fonctionne');
-
-        let clients = [];
-        let editingClientId = null;
-        const API_BASE_URL = 'https://straightbuilding.onrender.com';
-
-        console.log('Variables initialisées, API_BASE_URL:', API_BASE_URL);
-
-        // Test de base - vérifier si les éléments existent
-        console.log('Élément #saveClient:', $('#saveClient').length);
-        console.log('Élément #clientModal:', $('#clientModal').length);
-        console.log('Élément #clientForm:', $('#clientForm').length);
-
-        // Charger les clients au démarrage avec debug
-        function loadClients() {
-            console.log('=== DÉBUT CHARGEMENT CLIENTS ===');
-            $('#loading').show();
-            $('#clients-container').hide();
-            $('#empty-state').hide();
-
-            $.ajax({
-                url: `${API_BASE_URL}/api/clients`,
-                method: 'GET',
-                timeout: 15000,
-                beforeSend: function() {
-                    console.log('Envoi de la requête GET vers:', `${API_BASE_URL}/api/clients`);
-                },
-                success: function(data) {
-                    console.log('Succès chargement clients:', data);
-                    clients = data;
-                    displayClients();
-                },
-                error: function(xhr, status, error) {
-                    console.error('=== ERREUR CHARGEMENT CLIENTS ===');
-                    console.error('Status:', status);
-                    console.error('Error:', error);
-                    console.error('XHR Status:', xhr.status);
-                    console.error('Response Text:', xhr.responseText);
-                    console.error('Ready State:', xhr.readyState);
-
-                    showAlert('Erreur lors du chargement des clients: ' + error, 'alert-danger');
-                    $('#empty-state').show();
-                },
-                complete: function() {
-                    console.log('Chargement clients terminé');
-                    $('#loading').hide();
-                }
-            });
+    // Protection contre les erreurs d'autres scripts
+    window.addEventListener('error', function(e) {
+        // Ignorer les erreurs de flot.js qui ne nous concernent pas
+        if (e.filename && e.filename.includes('flot')) {
+            console.warn('Erreur Flot ignorée:', e.message);
+            return true; // Empêche l'arrêt du script
         }
-
-        // Fonction pour afficher les clients avec debug
-        function displayClients() {
-            console.log('=== AFFICHAGE CLIENTS ===');
-            console.log('Nombre de clients:', clients.length);
-
-            const container = $('#clients-container');
-            container.empty();
-
-            if (clients.length === 0) {
-                console.log('Aucun client à afficher');
-                $('#empty-state').show();
-                return;
-            }
-
-            clients.forEach((client, index) => {
-                console.log(`Affichage client ${index}:`, client);
-                const clientCard = createClientCard(client);
-                container.append(clientCard);
-            });
-
-            container.show();
-            console.log('Affichage des clients terminé');
-        }
-
-        // Fonction pour créer une carte client
-        function createClientCard(client) {
-            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(client.nom + ' ' + client.prenom)}&size=70&background=f44336&color=ffffff&font-size=0.6`;
-
-            return `
-        <div class="client-card" data-client-id="${client.id}">
-            <div class="client-header">
-                <img src="${avatarUrl}" alt="Avatar" class="client-avatar">
-            </div>
-            <div class="client-body">
-                <div class="client-name">${client.nom} ${client.prenom}</div>
-                <div class="client-info">
-                    <i class="material-icons">email</i>
-                    ${client.email}
-                </div>
-                <div class="client-info">
-                    <i class="material-icons">phone</i>
-                    ${client.phone}
-                </div>
-            </div>
-            <div class="client-actions">
-                <button class="btn btn-info btn-sm waves-effect" onclick="viewClient(${client.id})">
-                    <i class="material-icons">visibility</i>
-                    CONSULTER
-                </button>
-                <button class="btn btn-warning btn-sm waves-effect" onclick="editClient(${client.id})">
-                    <i class="material-icons">edit</i>
-                    MODIFIER
-                </button>
-                <button class="btn btn-danger btn-sm waves-effect" onclick="deleteClient(${client.id})">
-                    <i class="material-icons">delete</i>
-                    SUPPRIMER
-                </button>
-            </div>
-        </div>
-    `;
-        }
-
-        // Fonction de sauvegarde avec debug complet
-        function saveClient() {
-            console.log('=== DÉBUT SAUVEGARDE CLIENT ===');
-
-            const form = $('#clientForm')[0];
-            console.log('Formulaire trouvé:', !!form);
-
-            if (!form) {
-                console.error('Formulaire non trouvé!');
-                showAlert('Erreur: formulaire non trouvé', 'alert-danger');
-                return;
-            }
-
-            if (!form.checkValidity()) {
-                console.log('Formulaire invalide');
-                form.reportValidity();
-                return;
-            }
-
-            const clientData = {
-                nom: $('#nom').val().trim(),
-                prenom: $('#prenom').val().trim(),
-                email: $('#email').val().trim(),
-                phone: $('#phone').val().trim()
-            };
-
-            console.log('Données du client:', clientData);
-
-            // Validation côté client
-            if (!clientData.nom || !clientData.prenom || !clientData.email || !clientData.phone) {
-                console.log('Champs manquants');
-                showAlert('Tous les champs sont obligatoires', 'alert-danger');
-                return;
-            }
-
-            // Validation email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(clientData.email)) {
-                console.log('Email invalide');
-                showAlert('Veuillez entrer un email valide', 'alert-danger');
-                return;
-            }
-
-            console.log('Toutes les validations passées');
-
-            // UI feedback
-            $('#saveClient').prop('disabled', true);
-            $('#saveText').hide();
-            $('#saveSpinner').show();
-
-            const isEditing = editingClientId !== null;
-            const url = isEditing ? `${API_BASE_URL}/api/clients/${editingClientId}` : `${API_BASE_URL}/api/clients`;
-            const method = isEditing ? 'PUT' : 'POST';
-
-            if (isEditing) {
-                clientData.id = editingClientId;
-            }
-
-            console.log('URL:', url);
-            console.log('Method:', method);
-            console.log('Data to send:', JSON.stringify(clientData));
-
-            $.ajax({
-                url: url,
-                method: method,
-                contentType: 'application/json',
-                data: JSON.stringify(clientData),
-                timeout: 15000,
-                beforeSend: function(xhr) {
-                    console.log('=== ENVOI DE LA REQUÊTE ===');
-                    console.log('URL:', url);
-                    console.log('Method:', method);
-                    console.log('Content-Type:', xhr.getRequestHeader('Content-Type'));
-                },
-                success: function(response) {
-                    console.log('=== SUCCÈS SAUVEGARDE ===');
-                    console.log('Response:', response);
-                    showAlert(isEditing ? 'Client modifié avec succès' : 'Client ajouté avec succès', 'alert-success');
-                    $('#clientModal').modal('hide');
-                    loadClients();
-                },
-                error: function(xhr, status, error) {
-                    console.error('=== ERREUR SAUVEGARDE ===');
-                    console.error('Status:', status);
-                    console.error('Error:', error);
-                    console.error('XHR Status:', xhr.status);
-                    console.error('Response Text:', xhr.responseText);
-                    console.error('Ready State:', xhr.readyState);
-
-                    let message = 'Une erreur est survenue: ' + error;
-
-                    if (status === 'timeout') {
-                        message = 'Délai d\'attente dépassé. Veuillez réessayer.';
-                    } else if (xhr.status === 409) {
-                        message = 'L\'email ou le téléphone existe déjà';
-                    } else if (xhr.status === 400) {
-                        message = 'Données invalides. Vérifiez les champs.';
-                    } else if (xhr.status === 500) {
-                        message = 'Erreur serveur. Veuillez réessayer plus tard.';
-                    } else if (xhr.status === 0) {
-                        message = 'Impossible de se connecter au serveur.';
-                    }
-
-                    showAlert(message, 'alert-danger');
-                },
-                complete: function() {
-                    console.log('Requête terminée - restauration UI');
-                    $('#saveClient').prop('disabled', false);
-                    $('#saveText').show();
-                    $('#saveSpinner').hide();
-                }
-            });
-        }
-
-        // Event listeners avec debug
-        console.log('Ajout des event listeners...');
-
-        $('#saveClient').click(function(e) {
-            console.log('=== CLIC SUR ENREGISTRER ===');
-            console.log('Event:', e);
-            e.preventDefault();
-            saveClient();
-        });
-
-        $('#clientModal').on('hidden.bs.modal', function() {
-            console.log('Modal fermée - reset form');
-            resetForm();
-        });
-
-        console.log('Event listeners ajoutés');
-
-        // Fonction pour réinitialiser le formulaire
-        function resetForm() {
-            console.log('Reset du formulaire');
-            $('#clientForm')[0].reset();
-            $('#clientId').val('');
-            $('#modalTitle').text('Ajouter un Client');
-            $('#alert').hide();
-            editingClientId = null;
-            $('.form-line').removeClass('focused');
-        }
-
-        // Fonction pour afficher les alertes avec debug
-        function showAlert(message, type) {
-            console.log('Affichage alerte:', message, type);
-            const alertDiv = $('#alert');
-            alertDiv.removeClass('alert-success alert-danger alert-warning alert-info')
-                .addClass(type)
-                .text(message)
-                .show();
-
-            setTimeout(() => {
-                alertDiv.fadeOut();
-            }, 5000);
-        }
-
-        // Test de connectivité
-        function testConnection() {
-            console.log('=== TEST DE CONNECTIVITÉ ===');
-            $.ajax({
-                url: `${API_BASE_URL}/`,
-                method: 'GET',
-                timeout: 5000,
-                success: function(response) {
-                    console.log('Test de connectivité OK:', response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Test de connectivité échoué:', status, error);
-                }
-            });
-        }
-
-        // Fonctions globales pour les actions des cartes
-        window.viewClient = function(clientId) {
-            console.log('Voir client:', clientId);
-            // Code pour voir le client...
-        };
-
-        window.editClient = function(clientId) {
-            console.log('Modifier client:', clientId);
-            // Code pour modifier le client...
-        };
-
-        window.deleteClient = function(clientId) {
-            console.log('Supprimer client:', clientId);
-            // Code pour supprimer le client...
-        };
-
-        // Initialisation
-        console.log('Lancement du test de connectivité...');
-        testConnection();
-
-        console.log('Lancement du chargement des clients...');
-        loadClients();
-
-        console.log('=== INITIALISATION TERMINÉE ===');
     });
 
-    // Test jQuery hors document ready
-    console.log('jQuery disponible:', typeof $ !== 'undefined');
-    console.log('Version jQuery:', $.fn.jquery);
+    // Script principal dans un try-catch pour éviter les interruptions
+    try {
+        $(document).ready(function() {
+            console.log('=== CLIENT MANAGEMENT SCRIPT DÉMARRÉ ===');
 
-    // Test simple pour voir si le bouton existe
-    setTimeout(function() {
-        console.log('Test après 2 secondes:');
-        console.log('Bouton #saveClient existe:', $('#saveClient').length > 0);
-        console.log('Modal #clientModal existe:', $('#clientModal').length > 0);
-    }, 2000);
+            let clients = [];
+            let editingClientId = null;
+            const API_BASE_URL = 'https://straightbuilding.onrender.com';
+
+            console.log('API_BASE_URL configuré:', API_BASE_URL);
+
+            // Fonction pour charger tous les clients
+            function loadClients() {
+                console.log('Chargement des clients...');
+                $('#loading').show();
+                $('#clients-container').hide();
+                $('#empty-state').hide();
+
+                $.ajax({
+                    url: `${API_BASE_URL}/api/clients`,
+                    method: 'GET',
+                    timeout: 15000,
+                    success: function(data) {
+                        console.log('Clients chargés:', data);
+                        clients = Array.isArray(data) ? data : [];
+                        displayClients();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Erreur chargement clients:', {
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText,
+                            statusCode: xhr.status
+                        });
+
+                        let errorMessage = 'Erreur lors du chargement des clients';
+                        if (status === 'timeout') {
+                            errorMessage = 'Délai d\'attente dépassé';
+                        } else if (xhr.status === 0) {
+                            errorMessage = 'Impossible de se connecter au serveur';
+                        } else if (xhr.status === 404) {
+                            errorMessage = 'API non trouvée - vérifiez l\'URL';
+                        }
+
+                        showAlert(errorMessage, 'alert-danger');
+                        $('#empty-state').show();
+                    },
+                    complete: function() {
+                        $('#loading').hide();
+                    }
+                });
+            }
+
+            // Fonction pour afficher les clients
+            function displayClients() {
+                console.log('Affichage de', clients.length, 'clients');
+                const container = $('#clients-container');
+                container.empty();
+
+                if (clients.length === 0) {
+                    $('#empty-state').show();
+                    return;
+                }
+
+                clients.forEach(client => {
+                    const clientCard = createClientCard(client);
+                    container.append(clientCard);
+                });
+
+                container.show();
+            }
+
+            // Fonction pour créer une carte client
+            function createClientCard(client) {
+                const safeName = `${client.nom || ''} ${client.prenom || ''}`.trim();
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&size=70&background=f44336&color=ffffff&font-size=0.6`;
+
+                return `
+            <div class="client-card" data-client-id="${client.id}">
+                <div class="client-header">
+                    <img src="${avatarUrl}" alt="Avatar" class="client-avatar">
+                </div>
+                <div class="client-body">
+                    <div class="client-name">${safeName}</div>
+                    <div class="client-info">
+                        <i class="material-icons">email</i>
+                        ${client.email || ''}
+                    </div>
+                    <div class="client-info">
+                        <i class="material-icons">phone</i>
+                        ${client.phone || ''}
+                    </div>
+                </div>
+                <div class="client-actions">
+                    <button class="btn btn-info btn-sm waves-effect" onclick="viewClient(${client.id})">
+                        <i class="material-icons">visibility</i>
+                        CONSULTER
+                    </button>
+                    <button class="btn btn-warning btn-sm waves-effect" onclick="editClient(${client.id})">
+                        <i class="material-icons">edit</i>
+                        MODIFIER
+                    </button>
+                    <button class="btn btn-danger btn-sm waves-effect" onclick="deleteClient(${client.id})">
+                        <i class="material-icons">delete</i>
+                        SUPPRIMER
+                    </button>
+                </div>
+            </div>
+        `;
+            }
+
+            // Fonction pour sauvegarder un client
+            function saveClient() {
+                console.log('=== DÉBUT SAUVEGARDE CLIENT ===');
+
+                const form = $('#clientForm')[0];
+                if (!form || !form.checkValidity()) {
+                    console.log('Formulaire invalide');
+                    if (form) form.reportValidity();
+                    return;
+                }
+
+                const clientData = {
+                    nom: $('#nom').val().trim(),
+                    prenom: $('#prenom').val().trim(),
+                    email: $('#email').val().trim(),
+                    phone: $('#phone').val().trim()
+                };
+
+                console.log('Données client:', clientData);
+
+                // Validation
+                if (!clientData.nom || !clientData.prenom || !clientData.email || !clientData.phone) {
+                    showAlert('Tous les champs sont obligatoires', 'alert-danger');
+                    return;
+                }
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(clientData.email)) {
+                    showAlert('Veuillez entrer un email valide', 'alert-danger');
+                    return;
+                }
+
+                // UI feedback
+                const saveBtn = $('#saveClient');
+                saveBtn.prop('disabled', true);
+                $('#saveText').hide();
+                $('#saveSpinner').show();
+
+                const isEditing = editingClientId !== null;
+                const url = isEditing ? `${API_BASE_URL}/api/clients/${editingClientId}` : `${API_BASE_URL}/api/clients`;
+                const method = isEditing ? 'PUT' : 'POST';
+
+                if (isEditing) {
+                    clientData.id = editingClientId;
+                }
+
+                console.log('Requête:', method, url);
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: 'application/json',
+                    data: JSON.stringify(clientData),
+                    timeout: 15000,
+                    success: function(response) {
+                        console.log('Succès:', response);
+                        showAlert(isEditing ? 'Client modifié avec succès' : 'Client ajouté avec succès', 'alert-success');
+                        $('#clientModal').modal('hide');
+                        setTimeout(loadClients, 500); // Petit délai pour l'animation
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Erreur sauvegarde:', {
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText,
+                            statusCode: xhr.status
+                        });
+
+                        let message = 'Une erreur est survenue';
+                        if (status === 'timeout') {
+                            message = 'Délai d\'attente dépassé. Réessayez.';
+                        } else if (xhr.status === 409) {
+                            message = 'Email ou téléphone déjà utilisé';
+                        } else if (xhr.status === 400) {
+                            message = 'Données invalides';
+                        } else if (xhr.status === 500) {
+                            message = 'Erreur serveur';
+                        } else if (xhr.status === 0) {
+                            message = 'Pas de connexion serveur';
+                        }
+
+                        showAlert(message, 'alert-danger');
+                    },
+                    complete: function() {
+                        saveBtn.prop('disabled', false);
+                        $('#saveText').show();
+                        $('#saveSpinner').hide();
+                    }
+                });
+            }
+
+            // Fonction pour réinitialiser le formulaire
+            function resetForm() {
+                $('#clientForm')[0].reset();
+                $('#clientId').val('');
+                $('#modalTitle').text('Ajouter un Client');
+                $('#alert').hide();
+                editingClientId = null;
+                $('.form-line').removeClass('focused');
+            }
+
+            // Fonction pour afficher les alertes
+            function showAlert(message, type) {
+                const alertDiv = $('#alert');
+                alertDiv.removeClass('alert-success alert-danger alert-warning alert-info')
+                    .addClass(type)
+                    .html(`<i class="material-icons">${type.includes('success') ? 'check_circle' : 'error'}</i> ${message}`)
+                    .show();
+
+                setTimeout(() => alertDiv.fadeOut(), 5000);
+            }
+
+            // Event listeners
+            $('#saveClient').off('click').on('click', function(e) {
+                console.log('Clic sur Enregistrer');
+                e.preventDefault();
+                e.stopPropagation();
+                saveClient();
+            });
+
+            $('#clientModal').off('hidden.bs.modal').on('hidden.bs.modal', resetForm);
+
+            // Gestion focus inputs
+            $('.form-control').focus(function() {
+                $(this).parent('.form-line').addClass('focused');
+            }).blur(function() {
+                if ($(this).val() === '') {
+                    $(this).parent('.form-line').removeClass('focused');
+                }
+            });
+
+            // Fonctions globales
+            window.viewClient = function(clientId) {
+                console.log('Voir client:', clientId);
+                const client = clients.find(c => c.id == clientId);
+                if (client) {
+                    const safeName = `${client.nom || ''} ${client.prenom || ''}`.trim();
+                    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&size=120&background=f44336&color=ffffff&font-size=0.6`;
+
+                    $('#detailsContent').html(`
+                    <div class="text-center" style="margin-bottom: 30px;">
+                        <img src="${avatarUrl}" alt="Avatar" style="border-radius: 50%; margin-bottom: 15px; border: 4px solid #f44336;">
+                        <h3 style="color: #333; margin-bottom: 5px;">${safeName}</h3>
+                        <small style="color: #666;">ID: ${client.id}</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <i class="material-icons" style="color: #f44336; margin-right: 10px;">email</i>
+                                    <div>
+                                        <strong>Email:</strong><br>
+                                        <a href="mailto:${client.email}" style="color: #f44336;">${client.email}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                <div style="display: flex; align-items: center;">
+                                    <i class="material-icons" style="color: #f44336; margin-right: 10px;">phone</i>
+                                    <div>
+                                        <strong>Téléphone:</strong><br>
+                                        <a href="tel:${client.phone}" style="color: #f44336;">${client.phone}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                    $('#detailsModal').modal('show');
+                }
+            };
+
+            window.editClient = function(clientId) {
+                console.log('Modifier client:', clientId);
+                const client = clients.find(c => c.id == clientId);
+                if (client) {
+                    editingClientId = clientId;
+                    $('#modalTitle').text('Modifier le Client');
+                    $('#nom').val(client.nom || '');
+                    $('#prenom').val(client.prenom || '');
+                    $('#email').val(client.email || '');
+                    $('#phone').val(client.phone || '');
+                    $('.form-line').addClass('focused');
+                    $('#clientModal').modal('show');
+                }
+            };
+
+            window.deleteClient = function(clientId) {
+                console.log('Supprimer client:', clientId);
+                const client = clients.find(c => c.id == clientId);
+                if (client && confirm(`Supprimer ${client.nom} ${client.prenom} ?`)) {
+                    $.ajax({
+                        url: `${API_BASE_URL}/api/clients/${clientId}`,
+                        method: 'DELETE',
+                        timeout: 15000,
+                        success: function() {
+                            showAlert('Client supprimé avec succès', 'alert-success');
+                            loadClients();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Erreur suppression:', error);
+                            showAlert('Erreur lors de la suppression', 'alert-danger');
+                        }
+                    });
+                }
+            };
+
+            // Initialisation
+            console.log('Chargement initial des clients...');
+            loadClients();
+
+            console.log('=== SCRIPT CLIENT INITIALISÉ AVEC SUCCÈS ===');
+        });
+
+    } catch (error) {
+        console.error('Erreur fatale dans le script client:', error);
+
+        // Fallback simple si tout échoue
+        $(document).ready(function() {
+            $('#saveClient').click(function() {
+                alert('Erreur de script détectée. Veuillez recharger la page.');
+            });
+        });
+    }
 </script>
 
 
