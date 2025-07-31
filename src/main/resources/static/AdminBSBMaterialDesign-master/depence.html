@@ -583,21 +583,6 @@
 <!-- Slimscroll Plugin Js -->
 <script src="plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
 
-<script>
-    $(function () {
-        $('#leftsidebar .list').slimScroll({
-            height: 'calc(100vh - 140px)',
-            wheelStep: 10,
-            size: '7px',
-            color: '#fff',           // couleur de la barre
-            railColor: '#333',       // couleur du fond
-            alwaysVisible: true,
-            disableFadeOut: true,
-            railVisible: true
-        });
-    });
-</script>
-
 <!-- Bootstrap Core Js -->
 <script src="plugins/bootstrap/js/bootstrap.js"></script>
 
@@ -637,45 +622,81 @@
 <script src="js/demo.js"></script>
 
 <script>
+    /* -------------------------------------------------------------
+       CONFIG API – URL corrigée (sans espace final)
+    ------------------------------------------------------------- */
     const API_URL = 'https://straightbuilding.onrender.com/api';
 
-    /* ----------  Chargement des chantiers ---------- */
+    /* -------------------------------------------------------------
+       CHARGEMENT DES CHANTIERS (cartes)
+    ------------------------------------------------------------- */
     function loadChantiers() {
-        $.get(`${API_URL}/chantiers`, chantiers => {
-            const container = $('#chantiers-container');
-            container.empty();
-            chantiers.forEach(c => {
-                const color = {
-                    'EN_COURS':   'bg-light-green',
-                    'TERMINE':    'bg-blue',
-                    'PAS_ENCORE': 'bg-orange'
-                }[c.etat] || 'bg-grey';
-
-                const card = `
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                <div class="card ${color}">
-                  <div class="header">
-                    <h2><i class="material-icons">location_city</i> ${c.nomProjet}</h2>
-                  </div>
-                  <div class="body">
-                    <button class="btn btn-success waves-effect m-r-10"
-                            onclick="openAddDepence(${c.id})">
-                      <i class="material-icons">add</i> Ajouter
-                    </button>
-                    <button class="btn btn-primary waves-effect"
-                            onclick="openListeDepences(${c.id}, '${c.nomProjet}')">
-                      <i class="material-icons">attach_money</i> Dépences
-                    </button>
-                  </div>
+        // Affiche un petit loader le temps que ça charge
+        $('#chantiers-container').html(`
+            <div id="loading-chantiers" class="col-xs-12 text-center">
+                <div class="preloader pl-size-md">
+                    <div class="spinner-layer pl-red">
+                        <div class="circle-clipper left"><div class="circle"></div></div>
+                        <div class="circle-clipper right"><div class="circle"></div></div>
+                    </div>
                 </div>
-              </div>`;
-                container.append(card);
+                <p>Chargement des chantiers…</p>
+            </div>
+        `);
+
+        $.get(`${API_URL}/chantiers`)
+            .done(chantiers => {
+                const container = $('#chantiers-container');
+                container.empty(); // retire le loader
+
+                if (!chantiers || chantiers.length === 0) {
+                    container.html('<div class="col-xs-12 text-center"><h4>Aucun chantier trouvé.</h4></div>');
+                    return;
+                }
+
+                chantiers.forEach(c => {
+                    const color = {
+                        'EN_COURS':   'bg-light-green',
+                        'TERMINE':    'bg-blue',
+                        'PAS_ENCORE': 'bg-orange'
+                    }[c.etat] || 'bg-grey';
+
+                    const card = `
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="card ${color}">
+                                <div class="header">
+                                    <h2><i class="material-icons">location_city"></i> ${c.nomProjet}</h2>
+                                </div>
+                                <div class="body">
+                                    <button class="btn btn-success waves-effect m-r-10"
+                                            onclick="openAddDepence(${c.id})">
+                                        <i class="material-icons">add"></i> Ajouter
+                                    </button>
+                                    <button class="btn btn-primary waves-effect"
+                                            onclick="openListeDepences(${c.id}, '${c.nomProjet}')">
+                                        <i class="material-icons">attach_money"></i> Dépenses
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                    container.append(card);
+                });
+            })
+            .fail((jqXHR, textStatus, err) => {
+                $('#chantiers-container').html(
+                    `<div class="col-xs-12 text-center">
+                        <h4 class="col-red">Erreur lors du chargement des chantiers : ${textStatus} ${jqXHR.status}</h4>
+                     </div>`
+                );
+                console.error('Erreur loadChantiers :', textStatus, jqXHR.status, err);
             });
-        });
     }
 
-    /* ---------- Ajouter / Modifier ---------- */
+    /* -------------------------------------------------------------
+       GESTION DES DÉPENSES
+    ------------------------------------------------------------- */
     let currentChantierId;
+
     function openAddDepence(id) {
         currentChantierId = id;
         $('#depenceId').val('');
@@ -685,6 +706,7 @@
     }
 
     function openEditDepence(dep) {
+        currentChantierId = dep.idChantier;
         $('#depenceId').val(dep.id);
         $('#total').val(dep.total);
         $('#date').val(dep.date);
@@ -694,66 +716,101 @@
     }
 
     function saveDepence() {
-        const id = $('#depenceId').val();
-        const url   = id ? `${API_URL}/depences/${id}` : `${API_URL}/depences`;
-        const type  = id ? 'PUT' : 'POST';
+        const id   = $('#depenceId').val();
+        const url  = id ? `${API_URL}/depences/${id}` : `${API_URL}/depences`;
+        const type = id ? 'PUT'  : 'POST';
 
         const data = {
-            total: $('#total').val(),
-            date:  $('#date').val(),
+            total:       $('#total').val(),
+            date:        $('#date').val(),
             commentaire: $('#commentaire').val(),
-            idChantier: currentChantierId
+            idChantier:  currentChantierId
         };
 
-        $.ajax({ url, type, contentType:'application/json', data: JSON.stringify(data), success: () => {
+        $.ajax({
+            url,
+            type,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: () => {
                 $('#modalDepence').modal('hide');
-                loadChantiers();             // refresh
-            }});
-    }
-
-    /* ---------- Liste des dépences ---------- */
-    function openListeDepences(id, nom) {
-        $('#nomChantierSpan').text(nom);
-        $.get(`${API_URL}/depences/chantier/${id}`, deps => {
-            const box = $('#depences-container');
-            box.empty();
-            deps.forEach(d => {
-                const card = `
-              <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                <div class="card bg-cyan">
-                  <div class="header">
-                    <h2><i class="material-icons">attach_money</i> ${d.total} DH</h2>
-                    <small>${d.date}</small>
-                  </div>
-                  <div class="body">
-                    <p>${d.commentaire || '—'}</p>
-                    <button class="btn btn-warning btn-xs m-r-5"
-                            onclick='openEditDepence(${JSON.stringify(d)})'>
-                      <i class="material-icons">edit</i>
-                    </button>
-                    <button class="btn btn-danger btn-xs"
-                            onclick="deleteDepence(${d.id})">
-                      <i class="material-icons">delete</i>
-                    </button>
-                  </div>
-                </div>
-              </div>`;
-                box.append(card);
-            });
-            $('#modalListeDepences').modal('show');
+                loadChantiers(); // refresh
+            },
+            error: (jqXHR, textStatus, err) => {
+                alert(`Erreur lors de l'enregistrement : ${textStatus} ${jqXHR.status}`);
+                console.error('saveDepence :', textStatus, jqXHR.status, err);
+            }
         });
     }
 
+    /* -------------------------------------------------------------
+       LISTE DES DÉPENSES PAR CHANTIER
+    ------------------------------------------------------------- */
+    function openListeDepences(id, nom) {
+        $('#nomChantierSpan').text(nom);
+        $.get(`${API_URL}/depences/chantier/${id}`)
+            .done(deps => {
+                const box = $('#depences-container');
+                box.empty();
+
+                if (!deps || deps.length === 0) {
+                    box.html('<div class="col-xs-12 text-center"><h4>Aucune dépense pour ce chantier.</h4></div>');
+                } else {
+                    deps.forEach(d => {
+                        const card = `
+                            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                                <div class="card bg-cyan">
+                                    <div class="header">
+                                        <h2><i class="material-icons">attach_money"></i> ${d.total} DH</h2>
+                                        <small>${d.date}</small>
+                                    </div>
+                                    <div class="body">
+                                        <p>${d.commentaire || '—'}</p>
+                                        <button class="btn btn-warning btn-xs m-r-5"
+                                                onclick='openEditDepence(${JSON.stringify(d)})'>
+                                            <i class="material-icons">edit"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-xs"
+                                                onclick="deleteDepence(${d.id})">
+                                            <i class="material-icons">delete"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>`;
+                        box.append(card);
+                    });
+                }
+                $('#modalListeDepences').modal('show');
+            })
+            .fail((jqXHR, textStatus, err) => {
+                alert(`Erreur lors du chargement des dépenses : ${textStatus} ${jqXHR.status}`);
+                console.error('openListeDepences :', textStatus, jqXHR.status, err);
+            });
+    }
+
+    /* -------------------------------------------------------------
+       SUPPRESSION D’UNE DÉPENSE
+    ------------------------------------------------------------- */
     function deleteDepence(id) {
         if (confirm('Supprimer cette dépense ?')) {
-            $.ajax({ url: `${API_URL}/depences/${id}`, type: 'DELETE', success: () => {
+            $.ajax({
+                url: `${API_URL}/depences/${id}`,
+                type: 'DELETE',
+                success: () => {
                     loadChantiers();
                     $('#modalListeDepences').modal('hide');
-                }});
+                },
+                error: (jqXHR, textStatus, err) => {
+                    alert(`Erreur lors de la suppression : ${textStatus} ${jqXHR.status}`);
+                    console.error('deleteDepence :', textStatus, jqXHR.status, err);
+                }
+            });
         }
     }
 
-    /* ---------- Init ---------- */
+    /* -------------------------------------------------------------
+       INITIALISATION
+    ------------------------------------------------------------- */
     $(loadChantiers);
 </script>
 </body>
