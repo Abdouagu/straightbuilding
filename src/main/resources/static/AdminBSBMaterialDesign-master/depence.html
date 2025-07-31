@@ -588,7 +588,12 @@
         $('#leftsidebar .list').slimScroll({
             height: 'calc(100vh - 140px)',
             wheelStep: 10,
-            alwaysVisible: true
+            size: '7px',
+            color: '#fff',           // couleur de la barre
+            railColor: '#333',       // couleur du fond
+            alwaysVisible: true,
+            disableFadeOut: true,
+            railVisible: true
         });
     });
 </script>
