@@ -1551,6 +1551,16 @@
 <!-- Slimscroll Plugin Js -->
 <script src="plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
 
+<script>
+    $(function () {
+        $('#leftsidebar .list').slimScroll({
+            height: 'calc(100vh - 140px)',
+            wheelStep: 10,
+            alwaysVisible: true
+        });
+    });
+</script>
+
 <!-- Waves Effect Plugin Js -->
 <script src="plugins/node-waves/waves.js"></script>
 
