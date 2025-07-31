@@ -28,6 +28,8 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/static/**", "/AdminBSBMaterialDesign-master/**").permitAll()
                         .requestMatchers("/style.css", "/straight-building-logo.png").permitAll()
+                        // Autoriser l'endpoint pour les informations utilisateur (nécessite authentification)
+                        .requestMatchers("/api/current-user").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
