@@ -704,20 +704,25 @@
                         const card = `
                       <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                         <div class="card bg-cyan">
-                          <div class="header">
-                            <h2><i class="material-icons">attach_money</i> ${d.total} DH</h2>
-                            <small>${d.date}</small>
+                          <div class="header" style="padding-bottom: 0;">
+                            <h2 style="font-size: 24px; margin-bottom: 5px;">
+                              <i class="material-icons" style="font-size: 36px; vertical-align: middle;">attach_money</i>
+                              <span style="vertical-align: middle;">${d.total} DH</span>
+                            </h2>
+                            <small style="display: block; margin-top: 5px; font-size: 12px; color: #f0f0f0;">${d.date}</small>
                           </div>
-                          <div class="body">
-                            <p>${d.commentaire || '—'}</p>
-                            <button class="btn btn-warning btn-xs m-r-5"
-                                    onclick='openEditDepence(${JSON.stringify(d)})'>
-                              <i class="material-icons">edit</i>
-                            </button>
-                            <button class="btn btn-danger btn-xs"
-                                    onclick="deleteDepence(${d.id})">
-                              <i class="material-icons">delete</i>
-                            </button>
+                          <div class="body" style="padding-top: 10px;">
+                            <p style="min-height: 40px; margin-bottom: 15px;">${d.commentaire || '—'}</p>
+                            <div class="text-right">
+                              <button class="btn btn-warning btn-xs m-r-5"
+                                      onclick='openEditDepence(${JSON.stringify(d)})'>
+                                <i class="material-icons">edit</i>
+                              </button>
+                              <button class="btn btn-danger btn-xs"
+                                      onclick="deleteDepence(${d.id})">
+                                <i class="material-icons">delete</i>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>`;
