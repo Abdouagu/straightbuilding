@@ -512,7 +512,7 @@
 </section>
 
 <!-- === MODAL : Ajouter / Modifier une dépense === -->
-<div class="modal fade" id="modalDepence" tabindex="-1" role="dialog">
+<div class="modal fade" id="modalDepence" tabindex="-1" role="dialog" data-backdrop="false">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -575,61 +575,67 @@
 
 
 <script>
-    /* -------------------------------------------------------------
-       CONFIG API
-    ------------------------------------------------------------- */
     const API_URL = 'https://straightbuilding.onrender.com/api';
 
     /* -------------------------------------------------------------
-       CHARGEMENT DES CHANTIERS (cartes)
+       UTILITAIRES
     ------------------------------------------------------------- */
-    document.addEventListener('DOMContentLoaded', () => {
-        fetch(`${API_URL}/chantiers`)
-            .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-            .then(chantiers => {
-                const container = document.getElementById('chantiers-container');
-                container.innerHTML = '';
-                if (!chantiers || !chantiers.length) {
-                    container.innerHTML = '<div class="col-xs-12 text-center"><h4 class="col-grey">Aucun chantier trouvé.</h4></div>';
-                    return;
-                }
-                chantiers.forEach(c => {
-                    const color = {
-                        'EN_COURS':   'bg-light-green',
-                        'TERMINE':    'bg-blue',
-                        'PAS_ENCORE': 'bg-orange'
-                    }[c.etat] || 'bg-grey';
-                    container.insertAdjacentHTML('beforeend', `
-                  <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                    <div class="card ${color}">
-                      <div class="header">
-                        <h2><i class="material-icons">location_city"></i> ${c.nomProjet}</h2>
-                      </div>
-                      <div class="body">
-                        <button class="btn btn-success waves-effect m-r-10" onclick="openAddDepence(${c.id})">
-                          <i class="material-icons">add"></i> Ajouter
-                        </button>
-                        <button class="btn btn-primary waves-effect" onclick="openListeDepences(${c.id},'${c.nomProjet}')">
-                          <i class="material-icons">attach_money"></i> Dépenses
-                        </button>
-                      </div>
-                    </div>
-                  </div>`);
-                });
-            })
-            .catch(err => {
-                document.getElementById('chantiers-container').innerHTML =
-                    '<div class="col-xs-12 text-center"><h4 class="col-red">Erreur : ' + err.message + '</h4></div>';
-                console.error(err);
-            });
-    });
+    const totalCache = new Map();        // chantierId -> total
+
+    /* ---------- total des dépenses d’un chantier ---------- */
+    async function fetchTotal(id) {
+        const res = await fetch(`${API_URL}/depences/chantier/${id}`);
+        const deps = await res.json();
+        const sum = deps.reduce((s, d) => s + Number(d.total), 0);
+        totalCache.set(id, sum);
+        return sum;
+    }
+
+    /* ---------- rafraîchir le total affiché sur la carte ---------- */
+    function refreshTotalOnCard(chantierId) {
+        const card = document.querySelector(`.chantier-card[data-id="${chantierId}"]`);
+        if (!card) return;
+        const span = card.querySelector('.dep-total');
+        span.textContent = (totalCache.get(chantierId) || 0).toFixed(2) + ' DH';
+    }
+
+    /* ---------- charger / construire les cartes chantiers ---------- */
+    async function loadChantiers() {
+        const box = document.getElementById('chantiers-container');
+        box.innerHTML = '<div class="col-xs-12 text-center"><i class="fa fa-spinner fa-spin"></i> Chargement…</div>';
+        const chantiers = await fetch(`${API_URL}/chantiers`).then(r => r.json());
+
+        box.innerHTML = '';
+        for (const c of chantiers) {
+            const total = await fetchTotal(c.id);
+            const color = { EN_COURS:'bg-light-green', TERMINE:'bg-blue', PAS_ENCORE:'bg-orange' }[c.etat] || 'bg-grey';
+
+            box.insertAdjacentHTML('beforeend', `
+      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+        <div class="card chantier-card" data-id="${c.id}">
+          <div class="header ${color}">
+            <h2><i class="material-icons">location_city"></i> ${c.nomProjet}</h2>
+            <span class="dep-total">${total.toFixed(2)} DH</span>
+          </div>
+          <div class="body">
+            <button class="btn btn-success waves-effect m-r-10" onclick="openAddDepence(${c.id})">
+              <i class="material-icons">add"></i> Ajouter
+            </button>
+            <button class="btn btn-primary waves-effect" onclick="openListeDepences(${c.id},'${c.nomProjet}')">
+              <i class="material-icons">attach_money"></i> Dépenses
+            </button>
+          </div>
+        </div>
+      </div>`);
+        }
+    }
 
     /* -------------------------------------------------------------
-       GESTION DES DÉPENSES
+       DÉPENSES
     ------------------------------------------------------------- */
     let currentChantierId;
 
-    // Ajouter / Modifier
+    /* ---------- ouvrir modal d’ajout ---------- */
     function openAddDepence(id) {
         currentChantierId = id;
         document.getElementById('depenceId').value = '';
@@ -638,6 +644,7 @@
         $('#modalDepence').modal('show');
     }
 
+    /* ---------- ouvrir modal d’édition ---------- */
     function openEditDepence(dep) {
         currentChantierId = dep.idChantier;
         document.getElementById('depenceId').value = dep.id;
@@ -645,107 +652,90 @@
         document.getElementById('date').value = dep.date;
         document.getElementById('commentaire').value = dep.commentaire || '';
         document.getElementById('modalDepenceLabel').textContent = 'Modifier dépense';
-        $('#modalDepence').modal('show');
+
+        /* fermer la liste AVANT d’ouvrir l’édition pour éviter le chevauchement */
+        $('#modalListeDepences').modal('hide');
+        $('#modalDepence').css('z-index', 1055).modal('show');
     }
 
-    function saveDepence() {
+    /* ---------- enregistrer ---------- */
+    async function saveDepence() {
         const id   = document.getElementById('depenceId').value;
         const url  = id ? `${API_URL}/depences/${id}` : `${API_URL}/depences`;
         const type = id ? 'PUT' : 'POST';
-        const data = {
+
+        const body = {
             total:       document.getElementById('total').value,
             date:        document.getElementById('date').value,
             commentaire: document.getElementById('commentaire').value,
             idChantier:  currentChantierId
         };
-        fetch(url, {
-            method: type,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-            .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-            .then(() => { $('#modalDepence').modal('hide'); location.reload(); })
-            .catch(err => alert('Erreur : ' + err.message));
+
+        await fetch(url, { method: type, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        $('#modalDepence').modal('hide');
+        await fetchTotal(currentChantierId);  // recalcule total
+        refreshTotalOnCard(currentChantierId); // l’affiche
     }
 
-    // Liste des dépenses
-    function openListeDepences(id, nom) {
-        document.getElementById('nomChantierSpan').textContent = nom;
-        fetch(`${API_URL}/depences/chantier/${id}`)
-            .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-            .then(deps => {
-                const box = document.getElementById('depences-container');
-                box.innerHTML = '';
-                if (!deps || !deps.length) {
-                    box.innerHTML = '<div class="col-xs-12 text-center"><h4>Aucune dépense pour ce chantier.</h4></div>';
-                } else {
-                    deps.forEach(d => {
-                        const colorClass = d.total > 1000 ? 'danger' : d.total > 500 ? 'warning' : 'success';
-                        box.insertAdjacentHTML('beforeend', `
-                      <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                        <div class="card dep-card">
-                          <div class="header bg-${colorClass}">
-                            <h2 class="card-title">${d.total} <small>DH</small></h2>
-                            <span class="chip">${d.date}</span>
-                          </div>
-                          <div class="body">
-                            <p class="comment">${d.commentaire || '–'}</p>
-                            <div class="actions">
-                              <button class="btn btn-warning btn-xs m-r-5"
-                                      onclick='openEditDepence(${JSON.stringify(d)})'>
-                                <i class="material-icons">edit</i>
-                              </button>
-                              <button class="btn btn-danger btn-xs"
-                                      onclick="deleteDepence(${d.id})">
-                                <i class="material-icons">delete</i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>`);
-                    });
-                }
-                $('#modalListeDepences').modal('show');
-            })
-            .catch(err => alert('Erreur : ' + err.message));
-    }
-
-    // Supprimer
-    function deleteDepence(id) {
+    /* ---------- supprimer ---------- */
+    async function deleteDepence(id) {
         if (!confirm('Supprimer cette dépense ?')) return;
-        fetch(`${API_URL}/depences/${id}`, { method: 'DELETE' })
-            .then(r => r.ok ? location.reload() : Promise.reject(r.statusText))
-            .catch(err => alert('Erreur : ' + err.message));
+        await fetch(`${API_URL}/depences/${id}`, { method: 'DELETE' });
+        await fetchTotal(currentChantierId);
+        refreshTotalOnCard(currentChantierId);
+        openListeDepences(currentChantierId, document.getElementById('nomChantierSpan').textContent);
     }
+
+    /* ---------- liste des dépenses (simple) ---------- */
+    async function openListeDepences(id, nom) {
+        document.getElementById('nomChantierSpan').textContent = nom;
+        const deps = await fetch(`${API_URL}/depences/chantier/${id}`).then(r => r.json());
+        const box = document.getElementById('depences-container');
+        box.innerHTML = '';
+
+        if (!deps.length) {
+            box.innerHTML = '<div class="col-xs-12 text-center"><h4>Aucune dépense.</h4></div>';
+        } else {
+            deps.forEach(d => {
+                box.insertAdjacentHTML('beforeend', `
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+          <div class="card dep-simple">
+            <div class="header bg-cyan">
+              <h2>${d.total} DH</h2>
+              <small>${d.date}</small>
+            </div>
+            <div class="body">
+              <p>${d.commentaire || '–'}</p>
+              <button class="btn btn-warning btn-xs m-r-5"
+                      onclick='openEditDepence(${JSON.stringify(d)})'>
+                <i class="material-icons">edit</i>
+              </button>
+              <button class="btn btn-danger btn-xs"
+                      onclick="deleteDepence(${d.id})">
+                <i class="material-icons">delete</i>
+              </button>
+            </div>
+          </div>
+        </div>`);
+            });
+        }
+        $('#modalListeDepences').modal('show');
+    }
+
+    /* ---------- lancement ---------- */
+    document.addEventListener('DOMContentLoaded', loadChantiers);
 </script>
 
-<!-- ====== STYLE CARTES-DÉPENSES ====== -->
+<!-- ===== STYLE RAPIDE ===== -->
 <style>
-    /* Cartes dépenses modernes */
-    .dep-card {
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,.08);
-        transition: transform .25s, box-shadow .25s;
-        overflow: hidden;
-    }
-    .dep-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,.15);
-    }
-    .dep-card .header {
-        padding: 14px 16px 10px;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .dep-card .header.bg-success { background: linear-gradient(135deg,#4caf50 0%, #a5d6a7 100%); }
-    .dep-card .header.bg-warning { background: linear-gradient(135deg,#ff9800 0%, #ffcc02 100%); }
-    .dep-card .header.bg-danger  { background: linear-gradient(135deg,#f44336 0%, #ef9a9a 100%); }
-    .dep-card .card-title { margin: 0; font-size: 22px; font-weight: 600; }
-    .dep-card .chip { background: rgba(255,255,255,.25); padding: 3px 8px; border-radius: 12px; font-size: 11px; }
-    .dep-card .body { padding: 16px; }
-    .dep-card .comment { min-height: 40px; margin-bottom: 12px; color: #444; font-size: 14px; }
+    .chantier-card .header { display:flex; justify-content:space-between; align-items:center; }
+    .dep-simple { border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.1); transition:.2s; }
+    .dep-simple:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.15); }
+    .dep-simple .header { padding:12px 14px 8px; color:#fff; }
+    .dep-simple .body   { padding:12px; }
+    .dep-simple h2      { margin:0; font-size:20px; }
+    .dep-simple small   { opacity:.85; }
+    .dep-simple p       { margin:0 0 10px; min-height:20px; }
 </style>
 
 
