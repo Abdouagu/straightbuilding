@@ -547,7 +547,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-link waves-effect" onclick="saveDepence()">Enregistrer</button>
-                <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-link waves-effect" onclick="hideModal('modalDepence')">Annuler</button>
             </div>
         </div>
     </div>
@@ -566,7 +566,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-link waves-effect" onclick="hideModal('modalListeDepences')">Fermer</button>
             </div>
         </div>
     </div>
@@ -576,7 +576,52 @@
     const API_URL = 'https://straightbuilding.onrender.com/api';
 
     /* -------------------------------------------------------------
-       UTILITAIRES
+       UTILITAIRES DOM
+    ------------------------------------------------------------- */
+
+    // Fonction pour afficher un modal
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'block';
+            modal.classList.add('in');
+            document.body.classList.add('modal-open');
+
+            // Ajouter backdrop
+            if (!document.querySelector('.modal-backdrop')) {
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                document.body.appendChild(backdrop);
+            }
+        }
+    }
+
+    // Fonction pour cacher un modal
+    function hideModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.remove('in');
+            document.body.classList.remove('modal-open');
+
+            // Supprimer backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+    }
+
+    // Fonction pour définir le z-index d'un modal
+    function setModalZIndex(modalId, zIndex) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.zIndex = zIndex;
+        }
+    }
+
+    /* -------------------------------------------------------------
+       LOGIQUE MÉTIER
     ------------------------------------------------------------- */
     const totalCache = new Map();        // chantierId -> total
 
@@ -678,7 +723,7 @@
         document.getElementById('depenceId').value = '';
         resetForm();
         document.getElementById('modalDepenceLabel').textContent = 'Nouvelle dépense';
-        $('#modalDepence').modal('show');
+        showModal('modalDepence');
     }
 
     /* ---------- ouvrir modal d'édition ---------- */
@@ -696,11 +741,12 @@
         }, 100);
 
         /* fermer la liste AVANT d'ouvrir l'édition pour éviter le chevauchement */
-        $('#modalListeDepences').modal('hide');
+        hideModal('modalListeDepences');
 
         // Attendre un peu avant d'ouvrir le modal d'édition
         setTimeout(() => {
-            $('#modalDepence').css('z-index', 1055).modal('show');
+            setModalZIndex('modalDepence', 1055);
+            showModal('modalDepence');
         }, 300);
     }
 
@@ -718,7 +764,7 @@
         };
 
         await fetch(url, { method: type, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        $('#modalDepence').modal('hide');
+        hideModal('modalDepence');
         await fetchTotal(currentChantierId);  // recalcule total
         refreshTotalOnCard(currentChantierId); // l'affiche
     }
@@ -765,24 +811,58 @@
         </div>`);
             });
         }
-        $('#modalListeDepences').modal('show');
+        showModal('modalListeDepences');
     }
 
     /* ---------- Event listeners pour gérer les labels en temps réel ---------- */
-    $(document).ready(function() {
+    function initializeFormListeners() {
         // Ajouter des listeners pour les champs du formulaire
-        $('#total, #date, #commentaire').on('input focus blur', function() {
-            setTimeout(updateFloatingLabels, 10);
-        });
+        const totalInput = document.getElementById('total');
+        const dateInput = document.getElementById('date');
+        const commentaireInput = document.getElementById('commentaire');
 
-        // Gérer l'ouverture du modal
-        $('#modalDepence').on('shown.bs.modal', function() {
-            setTimeout(updateFloatingLabels, 100);
+        [totalInput, dateInput, commentaireInput].forEach(input => {
+            if (input) {
+                input.addEventListener('input', () => {
+                    setTimeout(updateFloatingLabels, 10);
+                });
+                input.addEventListener('focus', () => {
+                    setTimeout(updateFloatingLabels, 10);
+                });
+                input.addEventListener('blur', () => {
+                    setTimeout(updateFloatingLabels, 10);
+                });
+            }
         });
-    });
+    }
+
+    /* ---------- Gérer l'ouverture du modal ---------- */
+    function onModalDepenceShown() {
+        setTimeout(updateFloatingLabels, 100);
+    }
 
     /* ---------- lancement ---------- */
-    document.addEventListener('DOMContentLoaded', loadChantiers);
+    document.addEventListener('DOMContentLoaded', function() {
+        loadChantiers();
+        initializeFormListeners();
+
+        // Écouter l'événement d'ouverture du modal (si Bootstrap est disponible)
+        const modalDepence = document.getElementById('modalDepence');
+        if (modalDepence) {
+            // Observer les changements de style pour détecter l'ouverture du modal
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const modal = mutation.target;
+                        if (modal.style.display === 'block') {
+                            onModalDepenceShown();
+                        }
+                    }
+                });
+            });
+            observer.observe(modalDepence, { attributes: true });
+        }
+    });
 </script>
 
 <!-- ===== STYLE RAPIDE ===== -->
@@ -829,6 +909,32 @@
 
     .modal.fade.in {
         z-index: 1055;
+    }
+
+    /* Style pour le backdrop */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1040;
+        background-color: #000;
+    }
+
+    .modal-backdrop.fade {
+        filter: alpha(opacity=0);
+        opacity: 0;
+    }
+
+    .modal-backdrop.in {
+        filter: alpha(opacity=50);
+        opacity: 0.5;
+    }
+
+    /* Style pour body avec modal ouvert */
+    .modal-open {
+        overflow: hidden;
     }
 </style>
 
