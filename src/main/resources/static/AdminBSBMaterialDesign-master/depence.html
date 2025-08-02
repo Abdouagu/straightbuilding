@@ -524,21 +524,21 @@
                     <input type="hidden" id="chantierId">
 
                     <div class="form-group form-float">
-                        <div class="form-line">
+                        <div class="form-line" id="totalFormLine">
                             <input type="number" step="0.01" class="form-control" id="total" required>
                             <label class="form-label">Montant</label>
                         </div>
                     </div>
 
                     <div class="form-group form-float">
-                        <div class="form-line">
+                        <div class="form-line" id="dateFormLine">
                             <input type="date" class="form-control" id="date" required>
                             <label class="form-label">Date</label>
                         </div>
                     </div>
 
                     <div class="form-group form-float">
-                        <div class="form-line">
+                        <div class="form-line" id="commentaireFormLine">
                             <textarea rows="2" class="form-control no-resize" id="commentaire"></textarea>
                             <label class="form-label">Commentaire</label>
                         </div>
@@ -572,8 +572,6 @@
     </div>
 </div>
 
-
-
 <script>
     const API_URL = 'https://straightbuilding.onrender.com/api';
 
@@ -582,7 +580,7 @@
     ------------------------------------------------------------- */
     const totalCache = new Map();        // chantierId -> total
 
-    /* ---------- total des dépenses d’un chantier ---------- */
+    /* ---------- total des dépenses d'un chantier ---------- */
     async function fetchTotal(id) {
         const res = await fetch(`${API_URL}/depences/chantier/${id}`);
         const deps = await res.json();
@@ -614,15 +612,15 @@
       <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
         <div class="card chantier-card" data-id="${c.id}">
           <div class="header ${color}">
-            <h2><i class="material-icons">location_city"></i> ${c.nomProjet}</h2>
+            <h2><i class="material-icons">location_city</i> ${c.nomProjet}</h2>
             <span class="dep-total">${total.toFixed(2)} DH</span>
           </div>
           <div class="body">
             <button class="btn btn-success waves-effect m-r-10" onclick="openAddDepence(${c.id})">
-              <i class="material-icons">add"></i> Ajouter
+              <i class="material-icons">add</i> Ajouter
             </button>
             <button class="btn btn-primary waves-effect" onclick="openListeDepences(${c.id},'${c.nomProjet}')">
-              <i class="material-icons">attach_money"></i> Dépenses
+              <i class="material-icons">attach_money</i> Dépenses
             </button>
           </div>
         </div>
@@ -635,16 +633,55 @@
     ------------------------------------------------------------- */
     let currentChantierId;
 
-    /* ---------- ouvrir modal d’ajout ---------- */
+    /* ---------- Fonction pour gérer l'état des labels flottants ---------- */
+    function updateFloatingLabels() {
+        // Gérer le label du montant
+        const totalInput = document.getElementById('total');
+        const totalFormLine = document.getElementById('totalFormLine');
+        if (totalInput.value && totalInput.value.trim() !== '') {
+            totalFormLine.classList.add('focused');
+        } else {
+            totalFormLine.classList.remove('focused');
+        }
+
+        // Gérer le label de la date
+        const dateInput = document.getElementById('date');
+        const dateFormLine = document.getElementById('dateFormLine');
+        if (dateInput.value && dateInput.value.trim() !== '') {
+            dateFormLine.classList.add('focused');
+        } else {
+            dateFormLine.classList.remove('focused');
+        }
+
+        // Gérer le label du commentaire
+        const commentaireInput = document.getElementById('commentaire');
+        const commentaireFormLine = document.getElementById('commentaireFormLine');
+        if (commentaireInput.value && commentaireInput.value.trim() !== '') {
+            commentaireFormLine.classList.add('focused');
+        } else {
+            commentaireFormLine.classList.remove('focused');
+        }
+    }
+
+    /* ---------- Réinitialiser le formulaire ---------- */
+    function resetForm() {
+        document.getElementById('formDepence').reset();
+        // Retirer toutes les classes focused
+        document.getElementById('totalFormLine').classList.remove('focused');
+        document.getElementById('dateFormLine').classList.remove('focused');
+        document.getElementById('commentaireFormLine').classList.remove('focused');
+    }
+
+    /* ---------- ouvrir modal d'ajout ---------- */
     function openAddDepence(id) {
         currentChantierId = id;
         document.getElementById('depenceId').value = '';
-        document.getElementById('formDepence').reset();
+        resetForm();
         document.getElementById('modalDepenceLabel').textContent = 'Nouvelle dépense';
         $('#modalDepence').modal('show');
     }
 
-    /* ---------- ouvrir modal d’édition ---------- */
+    /* ---------- ouvrir modal d'édition ---------- */
     function openEditDepence(dep) {
         currentChantierId = dep.idChantier;
         document.getElementById('depenceId').value = dep.id;
@@ -653,9 +690,18 @@
         document.getElementById('commentaire').value = dep.commentaire || '';
         document.getElementById('modalDepenceLabel').textContent = 'Modifier dépense';
 
-        /* fermer la liste AVANT d’ouvrir l’édition pour éviter le chevauchement */
+        // Mettre à jour les labels flottants après avoir rempli les champs
+        setTimeout(() => {
+            updateFloatingLabels();
+        }, 100);
+
+        /* fermer la liste AVANT d'ouvrir l'édition pour éviter le chevauchement */
         $('#modalListeDepences').modal('hide');
-        $('#modalDepence').css('z-index', 1055).modal('show');
+
+        // Attendre un peu avant d'ouvrir le modal d'édition
+        setTimeout(() => {
+            $('#modalDepence').css('z-index', 1055).modal('show');
+        }, 300);
     }
 
     /* ---------- enregistrer ---------- */
@@ -674,7 +720,7 @@
         await fetch(url, { method: type, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         $('#modalDepence').modal('hide');
         await fetchTotal(currentChantierId);  // recalcule total
-        refreshTotalOnCard(currentChantierId); // l’affiche
+        refreshTotalOnCard(currentChantierId); // l'affiche
     }
 
     /* ---------- supprimer ---------- */
@@ -722,6 +768,19 @@
         $('#modalListeDepences').modal('show');
     }
 
+    /* ---------- Event listeners pour gérer les labels en temps réel ---------- */
+    $(document).ready(function() {
+        // Ajouter des listeners pour les champs du formulaire
+        $('#total, #date, #commentaire').on('input focus blur', function() {
+            setTimeout(updateFloatingLabels, 10);
+        });
+
+        // Gérer l'ouverture du modal
+        $('#modalDepence').on('shown.bs.modal', function() {
+            setTimeout(updateFloatingLabels, 100);
+        });
+    });
+
     /* ---------- lancement ---------- */
     document.addEventListener('DOMContentLoaded', loadChantiers);
 </script>
@@ -736,6 +795,41 @@
     .dep-simple h2      { margin:0; font-size:20px; }
     .dep-simple small   { opacity:.85; }
     .dep-simple p       { margin:0 0 10px; min-height:20px; }
+    .form-line.focused .form-label {
+        top: -10px;
+        left: 0;
+        font-size: 12px;
+        color: #999;
+        transform: translateY(0);
+    }
+
+    .form-line input:focus + .form-label,
+    .form-line textarea:focus + .form-label,
+    .form-line.focused .form-label {
+        top: -10px;
+        left: 0;
+        font-size: 12px;
+        color: #999;
+    }
+
+    /* Pour les champs de type date */
+    .form-line input[type="date"] + .form-label {
+        display: none;
+    }
+
+    /* Amélioration de l'espacement */
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    /* Style pour les modals qui se chevauchent */
+    .modal {
+        z-index: 1050;
+    }
+
+    .modal.fade.in {
+        z-index: 1055;
+    }
 </style>
 
 
