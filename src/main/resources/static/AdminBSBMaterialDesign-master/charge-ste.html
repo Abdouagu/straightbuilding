@@ -312,7 +312,7 @@
                         <span>Client</span>
                     </a>
                 </li>
-                <li class="active">
+                <li >
                     <a href="chantier.html">
                         <i class="material-icons">location_city</i>
                         <span>Chantier</span>
@@ -336,12 +336,13 @@
                         <span>Depence</span>
                     </a>
                 </li>
-                <li >
+                <li class="active">
                     <a href="charge-ste.html">
                         <i class="material-icons">account_balance_wallet</i>
                         <span>Charges société</span>
                     </a>
                 </li>
+
 
             </ul>
         </div>
@@ -503,510 +504,175 @@
     <!-- #END# Right Sidebar -->
 </section>
 
+
 <section class="content">
     <div class="container-fluid">
         <div class="block-header">
-            <div class="button-demo">
-                <button type="button" class="btn bg-red waves-effect" id="btn-ajouter"  style="color: white;" data-toggle="modal" data-target="#chantierModal">AJOUTER</button>
+            <h2>Gestion des charges société</h2>
+        </div>
+
+        <!-- Bouton Ajouter + Total global -->
+        <div class="row clearfix">
+            <div class="col-xs-12">
+                <button class="btn bg-red waves-effect" onclick="openAddCharge()">
+                    <i class="material-icons">add</i> Ajouter une charge
+                </button>
+                <span class="total-badge" id="totalCharges">0,00 DH</span>
             </div>
         </div>
 
-            <div class="row clearfix">
-                <!-- Les cartes seront ajoutées ici -->
-            </div>
-
-
-
-
-
+        <!-- Grille des charges -->
+        <div class="row clearfix" id="charges-container">
+            <!-- cartes injectées ici -->
+        </div>
     </div>
 </section>
 
-
-
-<!-- MODAL - Ajouter un Chantier -->
-<div id="chantierModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
+<!-- ===== MODAL Ajouter / Modifier ===== -->
+<div class="modal fade" id="modalCharge" tabindex="-1" data-backdrop="false">
+    <div class="modal-dialog">
         <div class="modal-content">
-
-            <!-- HEADER -->
             <div class="modal-header">
-                <h4 class="modal-title"><i class="material-icons">business</i> Ajouter un Chantier</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <i class="material-icons">close</i>
-                </button>
+                <h4 class="modal-title" id="modalChargeLabel">Ajouter une charge</h4>
             </div>
-
-            <!-- BODY -->
             <div class="modal-body">
-                <form id="chantierForm">
-
-                    <!-- Nom Projet -->
+                <form id="formCharge">
+                    <input type="hidden" id="chargeId">
                     <div class="form-group">
-                        <label for="nomProjet">Nom du projet</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">location_city</i></span>
-                            <div class="form-line">
-                                <input type="text" id="nomProjet" class="form-control" placeholder="Nom du projet">
-                            </div>
-                        </div>
+                        <label>Montant</label>
+                        <input type="number" step="0.01" id="totalCharge" class="form-control" required>
                     </div>
-
-                    <!-- Titre Foncier -->
                     <div class="form-group">
-                        <label for="titreFoncier">Titre Foncier</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">assignment</i></span>
-                            <div class="form-line">
-                                <input type="text" id="titreFoncier" class="form-control" placeholder="Titre foncier">
-                            </div>
-                        </div>
+                        <label>Date</label>
+                        <input type="date" id="dateCharge" class="form-control" required>
                     </div>
-
-                    <!-- Numéro de Police -->
                     <div class="form-group">
-                        <label for="numPolice">Numéro de police</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">confirmation_number</i></span>
-                            <div class="form-line">
-                                <input type="number" id="numPolice" class="form-control" placeholder="Numéro de police">
-                            </div>
-                        </div>
+                        <label>Commentaire</label>
+                        <textarea id="commentaireCharge" class="form-control" rows="3"></textarea>
                     </div>
-
-                    <!-- Date Ouverture -->
-                    <div class="form-group">
-                        <label for="dateOuverture">Date d’ouverture</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">event</i></span>
-                            <div class="form-line">
-                                <input type="date" id="dateOuverture" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Date Contrat -->
-                    <div class="form-group">
-                        <label for="dateContrat">Date du contrat</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">date_range</i></span>
-                            <div class="form-line">
-                                <input type="date" id="dateContrat" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Adresse -->
-                    <div class="form-group">
-                        <label for="adresse">Adresse</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">location_on</i></span>
-                            <div class="form-line">
-                                <input type="text" id="adresse" class="form-control" placeholder="Adresse du chantier">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Durée -->
-                    <div class="form-group">
-                        <label for="duree">Durée (jours)</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">hourglass_full</i></span>
-                            <div class="form-line">
-                                <input type="number" id="duree" class="form-control" placeholder="Durée en jours">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- État -->
-                    <div class="form-group">
-                        <label for="etat">État</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">flag</i></span>
-                            <div class="form-line">
-                                <select id="etat">
-                                    <option value="EN_COURS">En cours</option>
-                                    <option value="TERMINE">Terminé</option>
-                                    <option value="PAS_ENCORE">pas encore </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Budget -->
-                    <div class="form-group">
-                        <label for="budget">Budget (Dhs)</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">attach_money</i></span>
-                            <div class="form-line">
-                                <input type="number" step="0.01" id="budget" class="form-control"
-                                       placeholder="Budget total">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Client (Nom + Prénom) -->
-                    <div class="form-group">
-                        <label for="clientId">Client</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="material-icons">person</i></span>
-                            <div class="form-line">
-                                <select id="clientId" >
-                                    <option value="">Chargement...</option> <!-- option par défaut -->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- Bouton Enregistrer -->
-                    <button type="submit" class="btn btn-success m-t-15 waves-effect">
-                        <i class="material-icons">save</i> Enregistrer
-                    </button>
-
                 </form>
             </div>
-
+            <div class="modal-footer">
+                <button class="btn btn-link" onclick="saveCharge()">Enregistrer</button>
+                <button class="btn btn-link" data-dismiss="modal">Annuler</button>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- ===== MODAL Consultation détail ===== -->
+<div class="modal fade" id="modalConsultCharge" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Détail de la charge</h4>
+            </div>
+            <div class="modal-body" id="detailChargeBody">
+                <!-- contenu dynamique -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("chantierForm");
-        let modeEdition = false;
-        let chantierEnCoursId = null;
+    const API_URL = 'https://straightbuilding.onrender.com/api';
 
-        // Charger les chantiers existants
-        fetch("https://straightbuilding.onrender.com/api/chantiers")
-            .then(response => response.json())
-            .then(chantiers => {
-                chantiers.forEach(chantier => {
-                    if (chantier.client && chantier.client.id) {
-                        chantier.id_client = chantier.client.id;
-                    }
-                    ajouterCarteChantier(chantier, chantier.client);
-                });
-            })
-            .catch(error => {
-                console.error("Erreur lors du chargement des chantiers:", error);
-            });
+    let currentChargeId = null;
 
-        // Formulaire - Ajout ou Modification
-        if (form) {
-            form.addEventListener("submit", function (e) {
-                e.preventDefault();
+    /* ---------- total global ---------- */
+    async function fetchTotalCharges() {
+        const res = await fetch(`${API_URL}/charges`);
+        const charges = await res.json();
+        const sum = charges.reduce((s, c) => s + Number(c.total), 0);
+        document.getElementById('totalCharges').textContent = sum.toFixed(2) + ' DH';
+        return sum;
+    }
 
-                const chantier = {
-                    nomProjet: document.getElementById("nomProjet").value,
-                    titreFoncier: document.getElementById("titreFoncier").value,
-                    numPolice: parseInt(document.getElementById("numPolice").value),
-                    dateOuverture: document.getElementById("dateOuverture").value,
-                    dateContrat: document.getElementById("dateContrat").value,
-                    adresse: document.getElementById("adresse").value,
-                    duree: parseInt(document.getElementById("duree").value),
-                    etat: document.getElementById("etat").value,
-                    budget: parseFloat(document.getElementById("budget").value),
-                    id_client: parseInt(document.getElementById("clientId").value)
-                };
-
-                if (modeEdition && chantierEnCoursId) {
-                    console.log("Mode édition - ID du chantier:", chantierEnCoursId);
-                    console.log("Données à envoyer:", chantier);
-
-                    // ✅ Mode édition : PUT
-                    fetch(`https://straightbuilding.onrender.com/api/chantiers/${chantierEnCoursId}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(chantier)
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                if (response.status === 404) {
-                                    throw new Error("Chantier non trouvé");
-                                } else if (response.status === 409) {
-                                    throw new Error("Conflit - Numéro de police ou titre foncier déjà existant");
-                                } else {
-                                    throw new Error(`Erreur HTTP: ${response.status}`);
-                                }
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            alert("Chantier modifié avec succès !");
-                            $('#chantierModal').modal('hide');
-                            form.reset();
-                            modeEdition = false;
-                            chantierEnCoursId = null;
-                            // Assurer que l'ID est correctement défini
-                            if (data.id) {
-                                data.id_client = chantier.id_client;
-                                mettreAJourCarteChantier(data);
-                            } else {
-                                console.error("ID du chantier manquant dans la réponse:", data);
-                                // Recharger la page pour voir les modifications
-                                location.reload();
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Erreur lors de la modification:", error);
-                            alert("Erreur lors de la modification du chantier: " + error.message);
-                        });
-                } else {
-                    // ✅ Mode ajout : POST
-                    fetch("https://straightbuilding.onrender.com/api/chantiers", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(chantier)
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                if (response.status === 409) {
-                                    throw new Error("Conflit - Numéro de police, titre foncier ou nom de projet déjà existant");
-                                } else {
-                                    throw new Error(`Erreur HTTP: ${response.status}`);
-                                }
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            alert("Chantier ajouté avec succès !");
-                            $('#chantierModal').modal('hide');
-                            form.reset();
-                            // Assurer que l'ID est correctement défini
-                            if (data.id) {
-                                data.id_client = chantier.id_client;
-                                ajouterCarteChantier(data);
-                            } else {
-                                console.error("ID du chantier manquant dans la réponse:", data);
-                                // Recharger la page pour voir le nouveau chantier
-                                location.reload();
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Erreur lors de l'ajout:", error);
-                            alert("Erreur lors de l'ajout du chantier: " + error.message);
-                        });
-                }
-            });
-        }
-
-        // 🔁 Fonction de mise à jour d'une carte existante
-        function mettreAJourCarteChantier(chantier) {
-            const card = document.querySelector(`.btn-modifier[data-id='${chantier.id}']`)?.closest(".col-lg-4");
-            if (!card) return;
-
-            fetch(`https://straightbuilding.onrender.com/api/clients/${chantier.id_client}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Client non trouvé');
-                    }
-                    return response.json();
-                })
-                .then(client => {
-                    card.querySelector("h2").innerHTML = `
-                    <i class="material-icons" style="vertical-align: middle;">engineering</i>
-                    ${chantier.nomProjet}
-                    <small>Ouverture : ${chantier.dateOuverture}</small>
-                `;
-                    const dropdown = card.querySelector(".dropdown-menu");
-                    dropdown.innerHTML = `
-                    <li><strong>Titre foncier:</strong> ${chantier.titreFoncier}</li>
-                    <li><strong>Police:</strong> ${chantier.numPolice}</li>
-                    <li><strong>Durée:</strong> ${chantier.duree} jours</li>
-                    <li><strong>État:</strong> ${chantier.etat}</li>
-                    <li><strong>Budget:</strong> ${chantier.budget} Dhs</li>
-                    <li><strong>Adresse:</strong> ${chantier.adresse}</li>
-                `;
-                    card.querySelector(".body p").innerHTML = `<strong>Client:</strong> ${client.nom} ${client.prenom}`;
-
-                    const header = card.querySelector(".header");
-                    header.className = "header";
-                    switch (chantier.etat) {
-                        case "TERMINE": header.classList.add("bg-green"); break;
-                        case "EN_COURS": header.classList.add("bg-yellow"); break;
-                        case "PAS_ENCORE": header.classList.add("bg-red"); break;
-                        default: header.classList.add("bg-gray");
-                    }
-                })
-                .catch(error => {
-                    console.error("Erreur lors de la récupération du client:", error);
-                });
-        }
-
-        // 👉 Ajouter une carte
-        function ajouterCarteChantier(chantier, client = null) {
-            const container = document.querySelector(".row.clearfix");
-            const afficherCarte = (clientData) => {
-                let cardColorClass = chantier.etat === "TERMINE" ? "bg-green" :
-                    chantier.etat === "EN_COURS" ? "bg-yellow" :
-                        chantier.etat === "PAS_ENCORE" ? "bg-red" : "bg-gray";
-
-                const cardHTML = `
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" data-id="${chantier.id}">
-                    <div class="card">
-                        <div class="header ${cardColorClass}">
-                            <h2>
-                                <i class="material-icons" style="vertical-align: middle;">engineering</i>
-                                ${chantier.nomProjet}
-                                <small>Ouverture : ${chantier.dateOuverture}</small>
-                            </h2>
-                            <ul class="header-dropdown m-r--5">
-                                <li class="dropdown">
-                                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                                        <i class="material-icons">more_vert</i>
-                                    </a>
-                                    <ul class="dropdown-menu pull-right">
-                                        <li><strong>Titre foncier:</strong> ${chantier.titreFoncier}</li>
-                                        <li><strong>Police:</strong> ${chantier.numPolice}</li>
-                                        <li><strong>Durée:</strong> ${chantier.duree} jours</li>
-                                        <li><strong>État:</strong> ${chantier.etat}</li>
-                                        <li><strong>Budget:</strong> ${chantier.budget} Dhs</li>
-                                        <li><strong>Adresse:</strong> ${chantier.adresse}</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="body">
-                            <p><strong>Client:</strong> ${clientData ? clientData.nom + ' ' + clientData.prenom : 'Inconnu'}</p>
-                            <div class="text-right">
-                                <button class="btn btn-warning btn-sm waves-effect m-r-5 btn-modifier" data-id="${chantier.id}">
-                                    <i class="material-icons">edit</i> Modifier
-                                </button>
-                                <button class="btn btn-danger btn-sm waves-effect btn-supprimer" data-id="${chantier.id}">
-                                    <i class="material-icons">delete</i> Supprimer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    /* ---------- charger toutes les charges ---------- */
+    async function loadCharges() {
+        const box = document.getElementById('charges-container');
+        box.innerHTML = '<div class="col-xs-12 text-center"><i class="fa fa-spinner fa-spin"></i> Chargement…</div>';
+        const charges = await fetch(`${API_URL}/charges`).then(r => r.json());
+        box.innerHTML = '';
+        charges.forEach(c => {
+            box.insertAdjacentHTML('beforeend', `
+          <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+            <div class="card charge-card">
+              <div class="header bg-company">
+                <h2>${c.total} DH</h2>
+                <small>${c.date}</small>
+              </div>
+              <div class="body">
+                <p>${c.commentaire || '–'}</p>
+                <div class="text-right">
+                  <button class="btn btn-warning btn-xs"
+                          onclick="openEditCharge(${c.id})">Modifier</button>
+                  <button class="btn btn-info btn-xs"
+                          onclick="openConsultCharge(${JSON.stringify(c)})">Consulter</button>
                 </div>
-            `;
-                container.insertAdjacentHTML("beforeend", cardHTML);
+              </div>
+            </div>
+          </div>`);
+        });
+    }
 
-                // 🎯 Bouton Modifier
-                document.querySelector(`.btn-modifier[data-id='${chantier.id}']`).addEventListener("click", () => {
-                    console.log("Modification du chantier avec ID:", chantier.id);
-                    modeEdition = true;
-                    chantierEnCoursId = chantier.id;
+    /* ---------- CRUD ---------- */
+    function openAddCharge() {
+        currentChargeId = null;
+        document.getElementById('formCharge').reset();
+        document.getElementById('modalChargeLabel').textContent = 'Ajouter une charge';
+        $('#modalCharge').modal('show');
+    }
 
-                    // Récupérer les données actuelles du chantier depuis le serveur
-                    fetch(`https://straightbuilding.onrender.com/api/chantiers/${chantier.id}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`Chantier non trouvé: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(chantierData => {
-                            document.getElementById("nomProjet").value = chantierData.nomProjet;
-                            document.getElementById("titreFoncier").value = chantierData.titreFoncier;
-                            document.getElementById("numPolice").value = chantierData.numPolice;
-                            document.getElementById("dateOuverture").value = chantierData.dateOuverture;
-                            document.getElementById("dateContrat").value = chantierData.dateContrat;
-                            document.getElementById("adresse").value = chantierData.adresse;
-                            document.getElementById("duree").value = chantierData.duree;
-                            document.getElementById("etat").value = chantierData.etat;
-                            document.getElementById("budget").value = chantierData.budget;
-                            document.getElementById("clientId").value = chantierData.id_client;
-                            $('#chantierModal').modal('show');
-                        })
-                        .catch(error => {
-                            console.error("Erreur lors de la récupération du chantier:", error);
-                            alert("Erreur lors de la récupération des données du chantier: " + error.message);
-                        });
-                });
-
-                // 🗑️ Bouton Supprimer
-                document.querySelector(`.btn-supprimer[data-id='${chantier.id}']`).addEventListener("click", () => {
-                    if (confirm("Êtes-vous sûr de vouloir supprimer ce chantier ?")) {
-                        fetch(`https://straightbuilding.onrender.com/api/chantiers/${chantier.id}`, {
-                            method: "DELETE"
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`Erreur HTTP: ${response.status}`);
-                                }
-                                const card = document.querySelector(`.col-lg-4[data-id='${chantier.id}']`);
-                                if (card) card.remove();
-                                alert("Chantier supprimé avec succès !");
-                            })
-                            .catch(error => {
-                                console.error("Erreur lors de la suppression:", error);
-                                alert("Erreur lors de la suppression du chantier: " + error.message);
-                            });
-                    }
-                });
-            };
-
-            if (client) {
-                afficherCarte(client);
-            } else {
-                fetch(`https://straightbuilding.onrender.com/api/clients/${chantier.id_client}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Client non trouvé');
-                        }
-                        return response.json();
-                    })
-                    .then(clientData => afficherCarte(clientData))
-                    .catch(error => {
-                        console.error("Erreur lors de la récupération du client:", error);
-                        afficherCarte(null);
-                    });
-            }
-        }
-
-        // Charger les clients dans le formulaire
-        fetch("https://straightbuilding.onrender.com/api/clients")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur lors du chargement des clients');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const select = document.getElementById("clientId");
-                select.innerHTML = "";
-                data.forEach(client => {
-                    const option = document.createElement("option");
-                    option.value = client.id;
-                    option.textContent = `${client.nom} ${client.prenom}`;
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error("Erreur lors du chargement des clients:", error);
+    function openEditCharge(id) {
+        fetch(`${API_URL}/charges/${id}`)
+            .then(r => r.json())
+            .then(c => {
+                currentChargeId = id;
+                document.getElementById('chargeId').value = id;
+                document.getElementById('totalCharge').value = c.total;
+                document.getElementById('dateCharge').value = c.date;
+                document.getElementById('commentaireCharge').value = c.commentaire;
+                document.getElementById('modalChargeLabel').textContent = 'Modifier la charge';
+                $('#modalCharge').modal('show');
             });
+    }
+
+    function openConsultCharge(c) {
+        document.getElementById('detailChargeBody').innerHTML = `
+        <p><strong>Montant :</strong> ${c.total} DH</p>
+        <p><strong>Date :</strong> ${c.date}</p>
+        <p><strong>Commentaire :</strong> ${c.commentaire || '-'}</p>`;
+        $('#modalConsultCharge').modal('show');
+    }
+
+    async function saveCharge() {
+        const id   = document.getElementById('chargeId').value;
+        const url  = id ? `${API_URL}/charges/${id}` : `${API_URL}/charges`;
+        const body = {
+            total: document.getElementById('totalCharge').value,
+            date:  document.getElementById('dateCharge').value,
+            commentaire: document.getElementById('commentaireCharge').value
+        };
+        await fetch(url, {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        $('#modalCharge').modal('hide');
+        await fetchTotalCharges();
+        loadCharges();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchTotalCharges();
+        loadCharges();
     });
 </script>
-
-<style>
-    .dropdown-menu {
-        background-color: #ffffff;
-        color: #333;
-        padding: 10px;
-        border-radius: 5px;
-        min-width: 200px;
-    }
-
-    .dropdown-menu li {
-        padding: 5px 10px;
-        font-size: 14px;
-    }
-
-    .dropdown-menu li:hover {
-        background-color: #f0f0f0;
-        cursor: pointer;
-    }
-
-</style>
-
-<!-- Inclure le script pour charger les informations utilisateur -->
-<script src="js/user-info.js"></script>
 
 
 <!-- Jquery Core Js -->
@@ -1020,16 +686,6 @@
 
 <!-- Slimscroll Plugin Js -->
 <script src="plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
-
-<script>
-    $(function () {
-        $('#leftsidebar .list').slimScroll({
-            height: 'calc(100vh - 140px)',
-            wheelStep: 10,
-            alwaysVisible: true
-        });
-    });
-</script>
 
 <!-- Waves Effect Plugin Js -->
 <script src="plugins/node-waves/waves.js"></script>
@@ -1060,6 +716,8 @@
 
 <!-- Demo Js -->
 <script src="js/demo.js"></script>
+
+
 </body>
 
 </html>

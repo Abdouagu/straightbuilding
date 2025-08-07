@@ -37,13 +37,13 @@
                 opacity: .4,
 
                 // enables always-on mode for the scrollbar
-                alwaysVisible: false,
+                alwaysVisible: true,
 
                 // check if we should hide the scrollbar when user is hovering over
-                disableFadeOut: false,
+                disableFadeOut: true,
 
                 // sets visibility of the rail
-                railVisible: false,
+                railVisible: true,
 
                 // sets rail color
                 railColor: '#333',
@@ -64,7 +64,7 @@
                 wrapperClass: 'slimScrollDiv',
 
                 // check if mousewheel should scroll the window if we reach top/bottom
-                allowPageScroll: false,
+                allowPageScroll: true,
 
                 // scroll amount applied to each mouse wheel step
                 wheelStep: 20,
@@ -85,10 +85,10 @@
             this.each(function () {
 
                 var isOverPanel, isOverBar, isDragg, queueHide, touchDif,
-                  barHeight, percentScroll, lastScroll,
-                  divS = '<div></div>',
-                  minBarHeight = 30,
-                  releaseScroll = false;
+                    barHeight, percentScroll, lastScroll,
+                    divS = '<div></div>',
+                    minBarHeight = 30,
+                    releaseScroll = false;
 
                 // used in event handlers and for better minification
                 var me = $(this);
@@ -143,13 +143,13 @@
 
                 // wrap content
                 var wrapper = $(divS)
-                  .addClass(o.wrapperClass)
-                  .css({
-                      position: 'relative',
-                      overflow: 'hidden',
-                      width: o.width,
-                      height: o.height
-                  });
+                    .addClass(o.wrapperClass)
+                    .css({
+                        position: 'relative',
+                        overflow: 'hidden',
+                        width: o.width,
+                        height: o.height
+                    });
 
                 // update style for the div
                 me.css({
@@ -160,35 +160,35 @@
 
                 // create scrollbar rail
                 var rail = $(divS)
-                  .addClass(o.railClass)
-                  .css({
-                      width: o.size,
-                      height: '100%',
-                      position: 'absolute',
-                      top: 0,
-                      display: (o.alwaysVisible && o.railVisible) ? 'block' : 'none',
-                      'border-radius': o.railBorderRadius,
-                      background: o.railColor,
-                      opacity: o.railOpacity,
-                      zIndex: 90
-                  });
+                    .addClass(o.railClass)
+                    .css({
+                        width: o.size,
+                        height: '100%',
+                        position: 'absolute',
+                        top: 0,
+                        display: (o.alwaysVisible && o.railVisible) ? 'block' : 'none',
+                        'border-radius': o.railBorderRadius,
+                        background: o.railColor,
+                        opacity: o.railOpacity,
+                        zIndex: 90
+                    });
 
                 // create scrollbar
                 var bar = $(divS)
-                  .addClass(o.barClass)
-                  .css({
-                      background: o.color,
-                      width: o.size,
-                      position: 'absolute',
-                      top: 0,
-                      opacity: o.opacity,
-                      display: o.alwaysVisible ? 'block' : 'none',
-                      'border-radius': o.borderRadius,
-                      BorderRadius: o.borderRadius,
-                      MozBorderRadius: o.borderRadius,
-                      WebkitBorderRadius: o.borderRadius,
-                      zIndex: 99
-                  });
+                    .addClass(o.barClass)
+                    .css({
+                        background: o.color,
+                        width: o.size,
+                        position: 'absolute',
+                        top: 0,
+                        opacity: o.opacity,
+                        display: o.alwaysVisible ? 'block' : 'none',
+                        'border-radius': o.borderRadius,
+                        BorderRadius: o.borderRadius,
+                        MozBorderRadius: o.borderRadius,
+                        WebkitBorderRadius: o.borderRadius,
+                        zIndex: 99
+                    });
 
                 // set position
                 var posCss = (o.position == 'right') ? { right: o.distance } : { left: o.distance };

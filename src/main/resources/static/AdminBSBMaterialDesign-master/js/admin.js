@@ -30,14 +30,10 @@ $.AdminBSB.options = {
     leftSideBar: {
         scrollColor: 'rgba(0,0,0,0.5)',
         scrollWidth: '4px',
-        scrollAlwaysVisible: true,
+        scrollAlwaysVisible: false,
         scrollBorderRadius: '0',
         scrollRailBorderRadius: '0',
         scrollActiveItemWhenPageLoad: true,
-        scrollDisableFadeOut: true,        // AJOUTÉ - Empêche la disparition
-        scrollRailVisible: true,           // AJOUTÉ - Montre le rail
-        scrollRailColor: '#ddd',           // AJOUTÉ - Couleur du rail
-        scrollRailOpacity: 0.3,            // AJOUTÉ - Opacité du rail
         breakpointWidth: 1170
     },
     dropdownMenu: {
@@ -123,20 +119,13 @@ $.AdminBSB.leftSideBar = {
                 });
             }
 
-            // CONFIGURATION AMÉLIORÉE du slimScroll
             $el.slimscroll({
                 height: height + "px",
                 color: configs.scrollColor,
                 size: configs.scrollWidth,
                 alwaysVisible: configs.scrollAlwaysVisible,
-                disableFadeOut: configs.scrollDisableFadeOut,     // AJOUTÉ - Empêche la disparition
-                railVisible: configs.scrollRailVisible,          // AJOUTÉ - Montre le rail
-                railColor: configs.scrollRailColor,              // AJOUTÉ - Couleur du rail
-                railOpacity: configs.scrollRailOpacity,          // AJOUTÉ - Opacité du rail
                 borderRadius: configs.scrollBorderRadius,
-                railBorderRadius: configs.scrollRailBorderRadius,
-                wheelStep: 20,                                   // AJOUTÉ - Vitesse de scroll
-                allowPageScroll: false                           // AJOUTÉ - Empêche le scroll de la page
+                railBorderRadius: configs.scrollRailBorderRadius
             });
 
             //Scroll active menu item when page load, if option set = true
@@ -477,29 +466,4 @@ $(function () {
     $.AdminBSB.search.activate();
 
     setTimeout(function () { $('.page-loader-wrapper').fadeOut(); }, 50);
-});
-
-// CORRECTION SUPPLÉMENTAIRE POUR FORCER LA SCROLLBAR
-// Ajoutez ce code à la fin pour s'assurer que la scrollbar reste visible
-$(document).ready(function() {
-    // Attendre que tous les éléments soient chargés
-    setTimeout(function() {
-        // Réinitialiser slimScroll avec les bonnes options si nécessaire
-        if ($('.list').length && typeof $.fn.slimScroll !== 'undefined') {
-            $('.list').slimScroll({
-                height: 'auto',
-                size: '4px',
-                color: 'rgba(0,0,0,0.5)',
-                alwaysVisible: true,
-                disableFadeOut: true,
-                railVisible: true,
-                railColor: '#ddd',
-                railOpacity: 0.3,
-                wheelStep: 20,
-                allowPageScroll: false,
-                borderRadius: '0px',
-                railBorderRadius: '0px'
-            });
-        }
-    }, 1000);
 });
