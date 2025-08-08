@@ -512,7 +512,7 @@
         </div>
 
         <!-- Bouton Ajouter + Total global -->
-        <div class="row clearfix">
+        <div class="row clearfix btn-add-section">
             <div class="col-xs-12">
                 <button class="btn bg-red waves-effect" onclick="openAddCharge()">
                     <i class="material-icons">add</i> Ajouter une charge
@@ -579,10 +579,22 @@
 
 <!-- ===== STYLE ===== -->
 <style>
-    .charge-card      { border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.15); margin-bottom: 20px; }
-    .charge-card:hover{ transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.25); }
-    .header.bg-company{ background: linear-gradient(135deg,#ff9800 0%,#ff5722 100%); color:#fff; }
-    .total-badge      { margin-left: 15px; font-size: 18px; font-weight: bold; }
+    /* espacement haut */
+    .btn-add-section { margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+
+    /* carte simple */
+    .charge-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,.1);
+        margin-bottom: 20px;
+        background: #fff;
+    }
+    .charge-card .header {
+        padding: 12px 14px 8px;
+        color: #fff;
+        background: #ff9800;   /* couleur unie, sans dégradé */
+    }
+    .charge-card .body { padding: 12px; }
 </style>
 
 <!-- ===== SCRIPT ===== -->
@@ -607,20 +619,21 @@
         box.innerHTML = '';
         charges.forEach(c => {
             box.insertAdjacentHTML('beforeend', `
-        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-          <div class="card charge-card">
-            <div class="header bg-company">
-              <h2>${c.total} DH<small class="pull-right">${c.date}</small></h2>
-            </div>
-            <div class="body">
-              <p>${c.commentaire || '–'}</p>
-              <div class="text-right">
-                <button class="btn btn-warning btn-xs" onclick="openEditCharge(${c.id})">Modifier</button>
-                <button class="btn btn-info btn-xs" onclick="openConsultCharge(${JSON.stringify(c)})">Consulter</button>
-              </div>
-            </div>
-          </div>
-        </div>`);
+  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+    <div class="card charge-card">
+      <div class="header">
+        <h2>${c.total} DH <small class="pull-right">${c.date}</small></h2>
+      </div>
+      <div class="body">
+        <p>${c.commentaire || '–'}</p>
+        <div class="text-right">
+          <button class="btn btn-warning btn-xs" onclick="openEditCharge(${c.id})">Modifier</button>
+          <button class="btn btn-info btn-xs" onclick="openConsultCharge(${JSON.stringify(c)})">Consulter</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteCharge(${c.id})">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  </div>`);
         });
     }
 
@@ -668,6 +681,13 @@
             body: JSON.stringify(body)
         });
         $('#modalCharge').modal('hide');
+        await fetchTotalCharges();
+        loadCharges();
+    }
+
+    async function deleteCharge(id) {
+        if (!confirm('Supprimer cette charge ?')) return;
+        await fetch(`${API_URL}/charges/${id}`, { method: 'DELETE' });
         await fetchTotalCharges();
         loadCharges();
     }
