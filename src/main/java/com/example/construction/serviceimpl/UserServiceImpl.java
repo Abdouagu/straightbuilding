@@ -1,7 +1,7 @@
 package com.example.construction.serviceimpl;
 
-import com.example.construction.DTO.UserDTO;
-import com.example.construction.DTO.UserRequestDTO;
+import com.example.construction.dto.UserDTO;
+import com.example.construction.dto.UserRequestDTO;
 import com.example.construction.entities.AppUser;
 import com.example.construction.repository.Userepo;
 import com.example.construction.service.UserService;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO createUser(UserRequestDTO requestDTO) {
-        // Créer une nouvelle entité user à partir du DTO
+        // Créer une nouvelle entité user à partir du dto
         AppUser newAppUser = new AppUser();
         newAppUser.setUsername(requestDTO.getUsername());
         newAppUser.setPassword(passwordEncoder.encode(requestDTO.getPassword())); // Crypter le mot de passe
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         // Sauvegarder l'utilisateur
         AppUser savedAppUser = userRepository.save(newAppUser);
 
-        // Convertir et retourner le DTO
+        // Convertir et retourner le dto
         return convertToDTO(savedAppUser);
     }
 

@@ -1,4 +1,4 @@
-package com.example.construction.DTO;
+package com.example.construction.dto;
 
 import com.example.construction.entities.Etat;
 import lombok.AllArgsConstructor;
@@ -12,15 +12,15 @@ import java.util.Date;
 @AllArgsConstructor
 public class ChantierDTO {
     private Integer id;
-    private String NomProjet;
-    private String TitreFoncier;
-    private Integer NumPolice;
-    private Date DateOuverture;
-    private Date DateContrat;
-    private String Adresse;
-    private Integer Duree;
+    private String nomProjet;
+    private String titreFoncier;
+    private Integer numPolice;
+    private Date dateOuverture;
+    private Date dateContrat;
+    private String adresse;
+    private Integer duree;
     private Etat etat;
     private float budget;
-    private Integer id_client;
+    private Integer idClient;
 
 }

@@ -1,6 +1,6 @@
 package com.example.construction.controller;
 
-import com.example.construction.DTO.OuvrierDTO;
+import com.example.construction.dto.OuvrierDTO;
 import com.example.construction.entities.Type;
 import com.example.construction.service.OuvrierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +64,7 @@ public class OuvrierController {
                         .body("Erreur : Ce CIN est déjà utilisé.");
             }
 
-            // Créer le DTO
+            // Créer le dto
             OuvrierDTO dto = new OuvrierDTO();
             dto.setNom(nom);
             dto.setPrenom(prenom);
@@ -154,7 +154,7 @@ public class OuvrierController {
                 System.out.println("CIN inchangé: " + cin);
             }
 
-            // Créer le DTO avec les nouvelles données
+            // Créer le dto avec les nouvelles données
             OuvrierDTO dto = new OuvrierDTO();
             dto.setId(id);
             dto.setNom(nom);

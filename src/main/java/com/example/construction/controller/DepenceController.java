@@ -1,6 +1,6 @@
 package com.example.construction.controller;
 
-import com.example.construction.DTO.DepenceDTO;
+import com.example.construction.dto.DepenceDTO;
 import com.example.construction.service.DepenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

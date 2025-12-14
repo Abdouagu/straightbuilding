@@ -1,8 +1,8 @@
 package com.example.construction.service;
 
 
-import com.example.construction.DTO.PointageDTO;
-import com.example.construction.DTO.TableauPointageDTO;
+import com.example.construction.dto.PointageDTO;
+import com.example.construction.dto.TableauPointageDTO;
 
 import java.time.LocalDate;
 import java.util.List;

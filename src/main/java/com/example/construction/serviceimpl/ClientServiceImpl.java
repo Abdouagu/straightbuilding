@@ -1,6 +1,6 @@
 package com.example.construction.serviceimpl;
 
-import com.example.construction.DTO.ClientDTO;
+import com.example.construction.dto.ClientDTO;
 import com.example.construction.entities.client;
 import com.example.construction.repository.Clientrepo;
 import com.example.construction.service.ClientService;
@@ -20,7 +20,7 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     private Clientrepo clientRepository;
 
-    // Méthode pour convertir l'entité en DTO
+    // Méthode pour convertir l'entité en dto
     private ClientDTO convertToDTO(client client) {
         ClientDTO dto = new ClientDTO();
         dto.setId(client.getId());
@@ -31,7 +31,7 @@ public class ClientServiceImpl implements ClientService {
         return dto;
     }
 
-    // Méthode pour convertir le DTO en entité
+    // Méthode pour convertir le dto en entité
     private client convertToEntity(ClientDTO clientDTO) {
         client entity = new client();
         entity.setId(clientDTO.getId());
@@ -78,7 +78,7 @@ public class ClientServiceImpl implements ClientService {
         // Sauvegarde de l'entité mise à jour
         client updatedEntity = clientRepository.save(existingClient);
 
-        // Retourner le DTO mis à jour
+        // Retourner le dto mis à jour
         return convertToDTO(updatedEntity);
     }
 

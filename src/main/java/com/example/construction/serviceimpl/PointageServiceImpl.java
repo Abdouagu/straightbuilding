@@ -1,8 +1,8 @@
 package com.example.construction.serviceimpl;
 
-import com.example.construction.DTO.OuvrierDTO;
-import com.example.construction.DTO.PointageDTO;
-import com.example.construction.DTO.TableauPointageDTO;
+import com.example.construction.dto.OuvrierDTO;
+import com.example.construction.dto.PointageDTO;
+import com.example.construction.dto.TableauPointageDTO;
 import com.example.construction.entities.chantier;
 import com.example.construction.entities.ouvrier;
 import com.example.construction.entities.Pointage;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PointageServiceImpl implements PointageService {

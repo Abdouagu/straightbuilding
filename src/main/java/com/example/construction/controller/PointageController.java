@@ -1,10 +1,8 @@
 package com.example.construction.controller;
 
-import com.example.construction.DTO.PointageDTO;
-import com.example.construction.DTO.TableauPointageDTO;
+import com.example.construction.dto.PointageDTO;
+import com.example.construction.dto.TableauPointageDTO;
 import com.example.construction.entities.Pointage;
-import com.example.construction.entities.chantier;
-import com.example.construction.entities.ouvrier;
 import com.example.construction.repository.PointageRepository;
 import com.example.construction.repository.Chantierepo;
 import com.example.construction.repository.Ouvrierepo;

@@ -1,7 +1,7 @@
 package com.example.construction.service;
 
-import com.example.construction.DTO.UserDTO;
-import com.example.construction.DTO.UserRequestDTO;
+import com.example.construction.dto.UserDTO;
+import com.example.construction.dto.UserRequestDTO;
 
 import java.util.List;
 

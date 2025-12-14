@@ -1,7 +1,7 @@
 package com.example.construction.controller;
 
-import com.example.construction.DTO.UserDTO;
-import com.example.construction.DTO.UserRequestDTO;
+import com.example.construction.dto.UserDTO;
+import com.example.construction.dto.UserRequestDTO;
 import com.example.construction.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

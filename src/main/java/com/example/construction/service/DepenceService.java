@@ -1,6 +1,6 @@
 package com.example.construction.service;
 
-import com.example.construction.DTO.DepenceDTO;
+import com.example.construction.dto.DepenceDTO;
 
 import java.util.List;
 

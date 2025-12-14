@@ -1,6 +1,6 @@
 package com.example.construction.serviceimpl;
 
-import com.example.construction.DTO.OuvrierDTO;
+import com.example.construction.dto.OuvrierDTO;
 import com.example.construction.entities.Type;
 import com.example.construction.entities.chantier;
 import com.example.construction.entities.ouvrier;

@@ -1,8 +1,7 @@
 package com.example.construction.service;
 
-import com.example.construction.DTO.ChantierDTO;
+import com.example.construction.dto.ChantierDTO;
 import com.example.construction.entities.Etat;
-import com.example.construction.entities.chantier;
 
 import java.util.Date;
 import java.util.List;

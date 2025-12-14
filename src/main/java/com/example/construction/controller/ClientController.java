@@ -1,6 +1,6 @@
 package com.example.construction.controller;
 
-import com.example.construction.DTO.ClientDTO;
+import com.example.construction.dto.ClientDTO;
 import com.example.construction.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
 package com.example.construction.controller;
 
-import com.example.construction.DTO.ChantierDTO;
+import com.example.construction.dto.ChantierDTO;
 import com.example.construction.entities.Etat;
 import com.example.construction.service.ChantierService;
 import org.springframework.beans.factory.annotation.Autowired;

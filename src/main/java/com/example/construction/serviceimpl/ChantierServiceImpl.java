@@ -1,6 +1,6 @@
 package com.example.construction.serviceimpl;
 
-import com.example.construction.DTO.ChantierDTO;
+import com.example.construction.dto.ChantierDTO;
 import com.example.construction.entities.Etat;
 import com.example.construction.entities.chantier;
 import com.example.construction.entities.client;
@@ -12,12 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +26,7 @@ public class ChantierServiceImpl implements ChantierService {
     @Autowired
     private Clientrepo clientRepository;
 
-    // Méthode pour convertir l'entité en DTO
+    // Méthode pour convertir l'entité en dto
     private ChantierDTO convertToDTO(chantier chantier) {
         ChantierDTO dto = new ChantierDTO();
         dto.setId(chantier.getId());
@@ -51,7 +47,7 @@ public class ChantierServiceImpl implements ChantierService {
         return dto;
     }
 
-    // Méthode pour convertir le DTO en entité
+    // Méthode pour convertir le dto en entité
     private chantier convertToEntity(ChantierDTO chantierDTO) {
         chantier entity = new chantier();
         entity.setId(chantierDTO.getId());
@@ -124,7 +120,7 @@ public class ChantierServiceImpl implements ChantierService {
         // Sauvegarde de l'entité mise à jour
         chantier updatedEntity = chantierRepository.save(existingChantier);
 
-        // Retourner le DTO mis à jour avec l'ID
+        // Retourner le dto mis à jour avec l'ID
         ChantierDTO result = convertToDTO(updatedEntity);
 
         // S'assurer que l'ID est bien défini
