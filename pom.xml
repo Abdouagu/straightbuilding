@@ -21,8 +21,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- SONARQUBE avec TON USER TOKEN -->
-        <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <sonar.token>squ_a61283a4fb17c703022b3569bc64768d8c87efa1</sonar.token>
+        
+            <!-- REMPLACE ça : -->
+            <!-- <sonar.token>squ_a61283a4fb17c703022b3569bc64768d8c87efa1</sonar.token> -->
+
+            <!-- PAR ça : -->
+            <sonar.login>admin</sonar.login>
+            <sonar.password>admin</sonar.password>
 
         <sonar.projectKey>construction-management</sonar.projectKey>
         <sonar.projectName>Gestion Chantiers Construction</sonar.projectName>
