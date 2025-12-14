@@ -21,6 +21,6 @@ public class ChantierDTO {
     private Integer duree;
     private Etat etat;
     private float budget;
-    private Integer idClient;
+    private Integer id_client;
 
 }
