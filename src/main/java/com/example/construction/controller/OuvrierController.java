@@ -258,9 +258,14 @@ public class OuvrierController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OuvrierDTO>> getAllOuvriers() {
-        List<OuvrierDTO> ouvriers = ouvrierService.getAllOuvriers();
-        return ResponseEntity.ok(ouvriers);
+    public ResponseEntity<?> getAllOuvriers() {
+        try {
+            List<OuvrierDTO> ouvriers = ouvrierService.getAllOuvriers();
+            return ResponseEntity.ok(ouvriers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur serveur : " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

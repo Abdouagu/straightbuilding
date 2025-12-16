@@ -23,18 +23,38 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<ClientDTO> createClient(@RequestBody ClientDTO clientDTO) {
-        // Vérification de l'existence de l'email
-        if (clientService.existsByEmail(clientDTO.getEmail())) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
+        try {
+            // Vérification de l'existence de l'email
+            if (clientService.existsByEmail(clientDTO.getEmail())) {
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
 
-        // Vérification de l'existence du numéro de téléphone
-        if (clientService.existsByPhone(clientDTO.getPhone())) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
+            // Vérification de l'existence du numéro de téléphone
+            if (clientService.existsByPhone(clientDTO.getPhone())) {
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
 
-        ClientDTO createdClient = clientService.addClient(clientDTO);
-        return new ResponseEntity<>(createdClient, HttpStatus.CREATED);
+            ClientDTO createdClient = clientService.addClient(clientDTO);
+            return new ResponseEntity<>(createdClient, HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Log l'erreur
+            System.err.println("Erreur lors de la création du client: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ClientDTO>> getAllClients() {
+        try {
+            List<ClientDTO> clients = clientService.getAllClients();
+            return ResponseEntity.ok(clients);
+        } catch (Exception e) {
+            // Log l'erreur
+            System.err.println("Erreur lors de la récupération des clients: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}")
@@ -47,11 +67,7 @@ public class ClientController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<ClientDTO>> getAllClients() {
-        List<ClientDTO> clients = clientService.getAllClients();
-        return ResponseEntity.ok(clients);
-    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ClientDTO> updateClient(@PathVariable int id, @RequestBody ClientDTO clientDTO) {
