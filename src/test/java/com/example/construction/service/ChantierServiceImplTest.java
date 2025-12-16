@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class) // SEULEMENT cette annotation
 class ChantierServiceImplTest {
 
     @Mock
@@ -288,5 +288,111 @@ class ChantierServiceImplTest {
 
         // Then
         assertFalse(exists);
+    }
+
+    // Ajoute ces tests supplémentaires pour couvrir plus de méthodes :
+
+    @Test
+    void testFindByNomProjet() {
+        // Given
+        when(chantierRepository.findByNomProjet("Projet Test")).thenReturn(Optional.of(chantierEntity));
+
+        // When
+        ChantierDTO result = chantierService.findByNomProjet("Projet Test");
+
+        // Then
+        assertNotNull(result);
+        assertEquals("Projet Test", result.getNomProjet());
+    }
+
+    @Test
+    void testFindByTitreFoncier() {
+        // Given
+        when(chantierRepository.findByTitreFoncier("TF123")).thenReturn(Optional.of(chantierEntity));
+
+        // When
+        ChantierDTO result = chantierService.findByTitreFoncier("TF123");
+
+        // Then
+        assertNotNull(result);
+        assertEquals("TF123", result.getTitreFoncier());
+    }
+
+    @Test
+    void testFindByNumPolice() {
+        // Given
+        when(chantierRepository.findByNumPolice(12345)).thenReturn(Optional.of(chantierEntity));
+
+        // When
+        ChantierDTO result = chantierService.findByNumPolice(12345);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(12345, result.getNumPolice());
+    }
+
+    @Test
+    void testFindByDateOuvertureBetween() {
+        // Given
+        Date debut = new Date();
+        Date fin = new Date();
+
+        when(chantierRepository.findByDateOuvertureBetween(debut, fin))
+                .thenReturn(Arrays.asList(chantierEntity));
+
+        // When
+        List<ChantierDTO> result = chantierService.findByDateOuvertureBetween(debut, fin);
+
+        // Then
+        assertEquals(1, result.size());
+        assertEquals("Projet Test", result.get(0).getNomProjet());
+    }
+
+    @Test
+    void testExistsByTitreFoncier() {
+        // Given
+        when(chantierRepository.existsByTitreFoncier("TF123")).thenReturn(true);
+
+        // When
+        boolean exists = chantierService.existsByTitreFoncier("TF123");
+
+        // Then
+        assertTrue(exists);
+    }
+
+    @Test
+    void testExistsByNomProjet() {
+        // Given
+        when(chantierRepository.existsByNomProjet("Projet Test")).thenReturn(true);
+
+        // When
+        boolean exists = chantierService.existsByNomProjet("Projet Test");
+
+        // Then
+        assertTrue(exists);
+    }
+
+    @Test
+    void testExistsByTitreFoncierAndIdNot() {
+        // Given
+        when(chantierRepository.existsByTitreFoncierAndIdNot("TF123", 1)).thenReturn(true);
+
+        // When
+        boolean exists = chantierService.existsByTitreFoncierAndIdNot("TF123", 1);
+
+        // Then
+        assertTrue(exists);
+    }
+
+    @Test
+    void testExistsByNomProjetAndIdNot() {
+        // Given
+        when(chantierRepository.existsByNomProjetAndIdNot("Projet Test", 1)).thenReturn(true);
+
+        // When
+        boolean exists = chantierService.existsByNomProjetAndIdNot("Projet Test", 1);
+
+        // Then
+        assertTrue(exists);
     }
 }
