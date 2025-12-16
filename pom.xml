@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- SONARQUBE avec TON USER TOKEN -->
-        
+
             <!-- REMPLACE ça : -->
             <!-- <sonar.token>squ_a61283a4fb17c703022b3569bc64768d8c87efa1</sonar.token> -->
 
