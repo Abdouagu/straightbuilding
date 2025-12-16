@@ -2,26 +2,47 @@ package com.example.construction.test;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+/**
+ * Générateur de hash BCrypt pour les mots de passe.
+ * Utilise une variable d'environnement comme source.
+ */
 public class PasswordGenerator {
 
-    public static void main(String[] args) {
-        // 1. Récupérer le mot de passe depuis les variables d'environnement
-        String rawPassword = System.getenv("APP_PASSWORD");
+    private static final String ENV_VAR_NAME = "APP_SECRET_KEY";
+    private static final String ERROR_MSG =
+            "Configuration manquante : la variable " + ENV_VAR_NAME + " n'est pas définie";
+    private static final String USAGE_MSG =
+            "Définir la variable : export " + ENV_VAR_NAME + "=\"votre_secret\"";
 
-        // 2. Vérifier que le mot de passe est fourni
-        if (rawPassword == null || rawPassword.trim().isEmpty()) {
-            System.err.println("ERREUR : Variable d'environnement APP_PASSWORD non définie");
-            System.err.println("Usage : export APP_PASSWORD='ton_mot_de_passe'");
+    public static void main(String[] args) {
+        try {
+            String input = getInputFromEnv();
+            String hashed = hashPassword(input);
+            displayResult(hashed);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            System.err.println(USAGE_MSG);
             System.exit(1);
         }
+    }
 
-        // 3. Hasher le mot de passe
+    private static String getInputFromEnv() {
+        String value = System.getenv(ENV_VAR_NAME);
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(ERROR_MSG);
+        }
+        return value.trim();
+    }
+
+    private static String hashPassword(String plainText) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encodedPassword = encoder.encode(rawPassword);
+        return encoder.encode(plainText);
+    }
 
-        // 4. Afficher le résultat (sans le mot de passe en clair dans la sortie)
-        System.out.println("Mot de passe hashé avec succès !");
-        System.out.println("Hash BCrypt généré : " + encodedPassword);
-        System.out.println("Note : Conservez ce hash pour votre base de données");
+    private static void displayResult(String hashedPassword) {
+        System.out.println("✅ Hash généré avec succès");
+        System.out.println("🔐 Résultat BCrypt :");
+        System.out.println(hashedPassword);
+        System.out.println("\n⚠️  Conservez ce hash en lieu sûr !");
     }
 }
