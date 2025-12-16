@@ -20,15 +20,14 @@
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- SONARQUBE avec TON USER TOKEN -->
+        <!-- ⭐⭐⭐ CONFIGURATION SONARQUBE AVEC TON TOKEN ⭐⭐⭐ -->
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
 
-            <!-- REMPLACE ça : -->
-            <!-- <sonar.token>squ_a61283a4fb17c703022b3569bc64768d8c87efa1</sonar.token> -->
+        <!-- ⚠️ REMPLACE "squ_ton_token_ici" PAR TON VRAI TOKEN ⚠️ -->
+        <sonar.login>squ_2a9fa4d4956ca9f6e418a94e247eea1bd354a1eb</sonar.login>
+        <!-- SUPPRIME sonar.password - on utilise seulement le token -->
 
-            <!-- PAR ça : -->
-            <sonar.login>admin</sonar.login>
-            <sonar.password>admin</sonar.password>
-
+        <!-- Configuration du projet -->
         <sonar.projectKey>construction-management</sonar.projectKey>
         <sonar.projectName>Gestion Chantiers Construction</sonar.projectName>
         <sonar.projectVersion>1.0</sonar.projectVersion>
@@ -36,11 +35,14 @@
         <sonar.tests>src/test/java</sonar.tests>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
         <sonar.java.binaries>target/classes</sonar.java.binaries>
+
+        <!-- Jacoco pour la couverture de tests -->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>
+        <!-- Spring Boot Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -58,6 +60,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- Dev Tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -65,6 +68,7 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- PostgreSQL -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -78,6 +82,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -85,16 +90,25 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Jacoco pour les rapports de couverture (AJOUT IMPORTANT !) -->
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.12</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Plugin Resources avec UTF-8 -->
+            <!-- Plugin Resources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -134,11 +148,33 @@
                 <version>3.5.2</version>
             </plugin>
 
-            <!-- SonarQube Scanner -->
+            <!-- ⭐⭐⭐ SONARQUBE SCANNER ⭐⭐⭐ -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.11.0.3922</version>
+            </plugin>
+
+            <!-- ⭐⭐⭐ JACOCO POUR LA COUVERTURE DE TESTS ⭐⭐⭐ -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
